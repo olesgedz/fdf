@@ -6,7 +6,7 @@
 typedef struct    data_s
 {
 	    void          *mlx_ptr;
-		    void          *mlx_win;
+		    void          *win_ptr;
 }                 data_t;
 
 int main(void)
@@ -15,9 +15,20 @@ int main(void)
 
 		    if ((data.mlx_ptr = mlx_init()) == NULL)
 				        return (EXIT_FAILURE);
-			    if ((data.mlx_win = mlx_new_window(data.mlx_ptr, 640, 480, "Hello world")) == NULL)
+			    if ((data.win_ptr = mlx_new_window(data.mlx_ptr, 500, 500, "Hello world")) == NULL)
 					        return (EXIT_FAILURE);
-					mlx_pixel_put(data.mlx_ptr, data.mlx_win, 10, 10, 0);
+								int j = 0;
+								int k = 0;
+						while (j < 250)
+						{
+							k = 0;
+							while (k < 250)
+							{
+								mlx_pixel_put(data.mlx_ptr, data.win_ptr, j, k, 0xFFFFFF);
+								k++;
+							}
+							j++;
+						}
 				    mlx_loop(data.mlx_ptr);
 					    return (EXIT_SUCCESS);
 }
