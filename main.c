@@ -19,16 +19,17 @@ int main(void)
 					        return (EXIT_FAILURE);
 								int j = 0;
 								int k = 0;
-						while (j < 250)
-						{
-							k = 0;
-							while (k < 250)
-							{
-								mlx_pixel_put(data.mlx_ptr, data.win_ptr, j, k, 0xFFFFFF);
-								k++;
-							}
-							j++;
-						}
+						// while (j < 250)
+						// {
+						// 	k = 0;
+						// 	while (k < 250)
+						// 	{
+						// 		mlx_pixel_put(data.mlx_ptr, data.win_ptr, j, k, 0xFFFFFF);
+						// 		k++;
+						// 	}
+						// 	j++;
+						// }
+						mlx_string_put(data.mlx_ptr, data.win_ptr, j, k, 0xFFFFFF, "HELLO");
 				    mlx_loop(data.mlx_ptr);
 					    return (EXIT_SUCCESS);
 }
