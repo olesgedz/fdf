@@ -14,7 +14,7 @@ typedef struct    data_s
 		int 					w_height;
 		int 					bits_per_pixel;
 		int 					size_line;
-		
+
 		int endian;
 }                 data_t;
 
@@ -63,6 +63,19 @@ void ft_turnZ(t_point *point, double degree)
 	point->z = point->z;
 }
 
+
+static void iso(double *x, double *y, double z)
+{
+    int previous_x;
+    int previous_y;
+
+    previous_x = *x;
+    previous_y = *y;
+    *x = (previous_x - previous_y) * cos(0.523599);
+    *y = -z + (previous_x + previous_y) * sin(0.523599);
+}
+
+
 void ft_draw()
 {
 	int x = 0;
@@ -70,6 +83,7 @@ void ft_draw()
 	data.img_ptr = mlx_new_image (data.mlx_ptr, data.w_width, data.w_height);
 	data.img_data = mlx_get_data_addr (data.img_ptr, &data.bits_per_pixel, &data.size_line, &data.endian);
 	int size = 1;
+	iso(&point.x, &point.y, point.z);
 	while (y < size)
 	{
 		 x = 0;
@@ -89,7 +103,7 @@ void ft_draw()
 int ft_main(int key, void *param)
 {
 	// void new = mlx_new_image(data.mlx_ptr, 500 , 500);
-	// 
+	//
 	// mlx_put_image_to_window (data.mlx_ptr, data.win_ptr, 0, 0);
 	if (key == 2)
 		 	 point.x += 20;
@@ -116,8 +130,8 @@ int main(void)
 			data.bits_per_pixel  = 32;
 			data.size_line = 7680;
 			data.endian = 1;
-			
-			
+
+
 			point.x = 0;
 			point.y = 0;
 			point.z = 0;
@@ -127,7 +141,7 @@ int main(void)
 				        return (EXIT_FAILURE);
 			    if ((data.win_ptr = mlx_new_window(data.mlx_ptr, data.w_height, data.w_width, "Hello world")) == NULL)
 					        return (EXIT_FAILURE);
-					
+
 						printf("%d", mlx_key_hook(data.win_ptr, ft_main, (void *)0));
 					//	mlx_string_put(data.mlx_ptr, data.win_ptr, j, k, 0xFFFFFF, "HELLO");
 				    mlx_loop(data.mlx_ptr);
