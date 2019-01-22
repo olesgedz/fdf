@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <mlx.h>
+#include <math.h>
 
 typedef struct    data_s
 {
@@ -17,17 +18,18 @@ typedef struct    data_s
 		int endian;
 }                 data_t;
 
-typedef struct char_s
+typedef struct point_s
 {
-	int x;
-	int y;
+	double x;
+	double y;
+	double z;
 	int size;
-} t_char;
-int k = 0;
-int j = 0;
-data_t        data;
+} t_point;
 
-static void	img_pixel_put(int x, int y, int color)
+data_t        data;
+t_point		point;
+
+static void	ft_img_pixel_put(int x, int y, int color)
 {
 	int		i;
 
@@ -40,20 +42,41 @@ static void	img_pixel_put(int x, int y, int color)
 	}
 }
 
-void ft_draw(int k, int j)
+void ft_turnX(t_point *point, double degree)
+{
+	point->x = point->x;
+	point->y = point->y * cos(degree) + point->z * sin(degree) ;
+	point->z = -point->y * sin(degree) + point->z * cos(degree) ;
+}
+
+void ft_turnY(t_point *point, double degree)
+{
+	point->x = point->x * cos(degree) + point->z * sin(degree);
+	point->y = point->y;
+	point->z = -point->x * sin(degree) + point->z * cos(degree) ;
+}
+
+void ft_turnZ(t_point *point, double degree)
+{
+	point->x = point->x * cos(degree) -  point->y * sin(degree) ;
+	point->y = -point->x * sin(degree) + point->y * cos(degree) ;
+	point->z = point->z;
+}
+
+void ft_draw()
 {
 	int x = 0;
 	int y = 0;
 	data.img_ptr = mlx_new_image (data.mlx_ptr, data.w_width, data.w_height);
 	data.img_data = mlx_get_data_addr (data.img_ptr, &data.bits_per_pixel, &data.size_line, &data.endian);
-	
-	while (  y < 100)
+	int size = 1;
+	while (y < size)
 	{
 		 x = 0;
-		while (x < 100)
+		while (x < size)
 		{
 			//mlx_pixel_put(data.mlx_ptr, data.win_ptr, k+y, j+x, 0xFFFFFF);
-			img_pixel_put( k + x, j + y,  0xFFFFFFF);
+			ft_img_pixel_put( point.x + x, point.y + y,  0xFFFFFFF);
 			x++;
 		}
 		y++;
@@ -69,19 +92,23 @@ int ft_main(int key, void *param)
 	// 
 	// mlx_put_image_to_window (data.mlx_ptr, data.win_ptr, 0, 0);
 	if (key == 2)
-		 	 k += 20;
+		 	 point.x += 20;
 		if (key == 0)
-			k -= 20;
+			point.x -= 20;
 		if (key == 13)
-				 j -= 20;
+				 point.y -= 20;
 		if (key == 1)
-				j += 20;
-			printf("x:%d y:%d\n", k, j);
-			ft_draw(k,  j);
-	
-	
+				point.y += 20;
+		if (key == 38)
+			ft_turnX(&point, M_PI/6);
+			if (key == 37)
+				ft_turnY(&point, M_PI/6);
+				if (key == 40)
+					ft_turnZ(&point, M_PI/6);
+			printf("x:%f y:%f z:%f key%d\n", point.x, point.y, point.z, key);
+			ft_draw();
 	return (0);
-} 
+}
 int main(void)
 {
 	    data.w_height = 500;
@@ -89,7 +116,13 @@ int main(void)
 			data.bits_per_pixel  = 32;
 			data.size_line = 7680;
 			data.endian = 1;
+			
+			
+			point.x = 0;
+			point.y = 0;
+			point.z = 0;
 
+		//	printf("%f\n", sin(M_PI/2));
 		    if ((data.mlx_ptr = mlx_init()) == NULL)
 				        return (EXIT_FAILURE);
 			    if ((data.win_ptr = mlx_new_window(data.mlx_ptr, data.w_height, data.w_width, "Hello world")) == NULL)
