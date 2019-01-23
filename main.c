@@ -5,6 +5,7 @@
 #include <math.h>
 #include "libft.h"
  #include <fcntl.h>
+ #include <unistd.h>
 
 typedef struct    data_s
 {
@@ -36,6 +37,7 @@ typedef struct map_s
 
 data_t        data;
 t_point3d		point;
+t_map map;
 
 static void	ft_img_pixel_put(int x, int y, int color)
 {
@@ -160,27 +162,30 @@ int ft_countWords(char *s)
 	return (count);
 }
 
-int ft_validateMap(char **argv)
+void ft_validateMap(char **argv)
 {
 	int fd = open(argv[1], O_RDONLY);
 	int i = 0;
 	char* line;
 	while (get_next_line(fd, &line) > 0)
 	{
-
-		ft_putstr(line);
-		printf("x:%d\n",ft_countWords(line));
-		ft_putstr("\n");
+		map.width = ft_countWords(line);
 		free(line);
 		i++;
 	}
 	close(fd);
-	printf("y:%d", i);
-	return (0);
+	map.height = i;
+}
+
+void ft_save_points()
+{
+
 }
 
 int main(int argc, char **argv)
 {
+		map.height = 0;
+		map.width = 0;
 	  //   data.w_height = 500;
 		// 	data.w_width = 500;
 		// 	data.bits_per_pixel  = 32;
@@ -210,5 +215,9 @@ int main(int argc, char **argv)
 	// 	return (0);
 	// }
 	ft_validateMap(argv);
+	ft_save_points();
+	
+	printf("map: %zu %zu\n", map.width, map.height);
+	
 	return (0);
 }
