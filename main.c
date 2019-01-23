@@ -83,7 +83,7 @@ void ft_draw()
 	data.img_ptr = mlx_new_image (data.mlx_ptr, data.w_width, data.w_height);
 	data.img_data = mlx_get_data_addr (data.img_ptr, &data.bits_per_pixel, &data.size_line, &data.endian);
 	int size = 1;
-	iso(&point.x, &point.y, point.z);
+	//iso(&point.x, &point.y, point.z);
 	while (y < size)
 	{
 		 x = 0;
