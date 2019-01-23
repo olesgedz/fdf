@@ -3,6 +3,8 @@
 #include <string.h>
 #include <mlx.h>
 #include <math.h>
+#include "libft.h"
+ #include <fcntl.h>
 
 typedef struct    data_s
 {
@@ -24,10 +26,16 @@ typedef struct point_s
 	double y;
 	double z;
 	int size;
-} t_point;
+} t_point3d;
+
+typedef struct map_s
+{
+	size_t width;
+	size_t height;
+} t_map;
 
 data_t        data;
-t_point		point;
+t_point3d		point;
 
 static void	ft_img_pixel_put(int x, int y, int color)
 {
@@ -42,21 +50,21 @@ static void	ft_img_pixel_put(int x, int y, int color)
 	}
 }
 
-void ft_turnX(t_point *point, double degree)
+void ft_turnX(t_point3d *point, double degree)
 {
 	point->x = point->x;
 	point->y = point->y * cos(degree) + point->z * sin(degree) ;
 	point->z = -point->y * sin(degree) + point->z * cos(degree) ;
 }
 
-void ft_turnY(t_point *point, double degree)
+void ft_turnY(t_point3d *point, double degree)
 {
 	point->x = point->x * cos(degree) + point->z * sin(degree);
 	point->y = point->y;
 	point->z = -point->x * sin(degree) + point->z * cos(degree) ;
 }
 
-void ft_turnZ(t_point *point, double degree)
+void ft_turnZ(t_point3d *point, double degree)
 {
 	point->x = point->x * cos(degree) -  point->y * sin(degree) ;
 	point->y = -point->x * sin(degree) + point->y * cos(degree) ;
@@ -123,27 +131,84 @@ int ft_main(int key, void *param)
 			ft_draw();
 	return (0);
 }
-int main(void)
+
+
+int ft_is_space(char c)
 {
-	    data.w_height = 500;
-			data.w_width = 500;
-			data.bits_per_pixel  = 32;
-			data.size_line = 7680;
-			data.endian = 1;
+	if (c == ' ' || c == '\n' || c == '\t'
+		|| c == '\v' || c == '\r' || c == '\f' || c == '\0')
+		return (1);
+	return (0);
+}
 
+int ft_countWords(char *s)
+{
+	int i;
+	int count;
 
-			point.x = 0;
-			point.y = 0;
-			point.z = 0;
+	i = 0;
+	count = 0;
+	while (s[i] != '\0')
+	{
+		while(ft_is_space(s[i]) && s[i])
+			i++;
+		if (!ft_is_space(s[i]))
+			count++;
+		while(!ft_is_space(s[i]) && s[i])
+			i++;
+	}
+	return (count);
+}
 
-		//	printf("%f\n", sin(M_PI/2));
-		    if ((data.mlx_ptr = mlx_init()) == NULL)
-				        return (EXIT_FAILURE);
-			    if ((data.win_ptr = mlx_new_window(data.mlx_ptr, data.w_height, data.w_width, "Hello world")) == NULL)
-					        return (EXIT_FAILURE);
+int ft_validateMap(char **argv)
+{
+	int fd = open(argv[1], O_RDONLY);
+	int i = 0;
+	char* line;
+	while (get_next_line(fd, &line) > 0)
+	{
 
-						printf("%d", mlx_key_hook(data.win_ptr, ft_main, (void *)0));
-					//	mlx_string_put(data.mlx_ptr, data.win_ptr, j, k, 0xFFFFFF, "HELLO");
-				    mlx_loop(data.mlx_ptr);
-					    return (EXIT_SUCCESS);
+		ft_putstr(line);
+		printf("x:%d\n",ft_countWords(line));
+		ft_putstr("\n");
+		free(line);
+		i++;
+	}
+	close(fd);
+	printf("y:%d", i);
+	return (0);
+}
+
+int main(int argc, char **argv)
+{
+	  //   data.w_height = 500;
+		// 	data.w_width = 500;
+		// 	data.bits_per_pixel  = 32;
+		// 	data.size_line = 7680;
+		// 	data.endian = 1;
+		//
+		//
+		// 	point.x = 0;
+		// 	point.y = 0;
+		// 	point.z = 0;
+		//
+		// //	printf("%f\n", sin(M_PI/2));
+		//     if ((data.mlx_ptr = mlx_init()) == NULL)
+		// 		        return (EXIT_FAILURE);
+		// 	    if ((data.win_ptr = mlx_new_window(data.mlx_ptr, data.w_height, data.w_width, "Hello world")) == NULL)
+		// 			        return (EXIT_FAILURE);
+		//
+		// 				printf("%d", mlx_key_hook(data.win_ptr, ft_main, (void *)0));
+		// 			//	mlx_string_put(data.mlx_ptr, data.win_ptr, j, k, 0xFFFFFF, "HELLO");
+		// 		    mlx_loop(data.mlx_ptr);
+		// 			    return (EXIT_SUCCESS);
+	int fd = 0;
+	char *line;
+	// if (argc != 2)
+	// {
+	// 	ft_putstr("usage:\n");
+	// 	return (0);
+	// }
+	ft_validateMap(argv);
+	return (0);
 }
