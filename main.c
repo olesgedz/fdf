@@ -17,7 +17,6 @@ typedef struct    data_s
 		int 					w_height;
 		int 					bits_per_pixel;
 		int 					size_line;
-
 		int endian;
 }                 data_t;
 
@@ -33,6 +32,7 @@ typedef struct map_s
 {
 	size_t width;
 	size_t height;
+	t_point3d *points;
 } t_map;
 
 data_t        data;
@@ -177,9 +177,35 @@ void ft_validateMap(char **argv)
 	map.height = i;
 }
 
-void ft_save_points()
+void ft_save_points(char **argv)
 {
+	int fd = open(argv[1], O_RDONLY);
+	int i = 0;
+	char *line;
+	char **temp;
+	int j = 0;
+	int nPoint = 0;
 
+	map.points = malloc(sizeof(t_point3d) * map.width * map.height);
+	while (get_next_line(fd, &line) > 0)
+	{
+		temp = ft_strsplit(line, ' ');
+		j = 0;
+		while (temp[j] != NULL)
+		{
+			map.points[nPoint].x = j;
+			map.points[nPoint].y = i;
+			map.points[nPoint].z = ft_atoi(temp[j]);
+			//printf("%f %d ", map.points[nPoint].z, nPoint);
+			//printf("%d\n", ft_atoi(temp[j]));
+			nPoint++;
+			j++;
+		}
+		//free temp
+		free(line);
+		i++;
+	}
+	close(fd);
 }
 
 int main(int argc, char **argv)
@@ -215,9 +241,22 @@ int main(int argc, char **argv)
 	// 	return (0);
 	// }
 	ft_validateMap(argv);
-	ft_save_points();
-	
+	ft_save_points(argv);
+
 	printf("map: %zu %zu\n", map.width, map.height);
-	
+	int i = 0;
+	int count = 0;
+	// while (i < map.width * map.height)
+	// {
+	// 	printf("%f ", map.points[i].z);
+	// 			count++;
+	// 	if (count == map.width)
+	// 	{
+	// 		count = 0;
+	// 		ft_putstr("\n");
+	// 	}
+	//
+	// 	i++;
+	// }
 	return (0);
 }
