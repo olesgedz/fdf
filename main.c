@@ -56,34 +56,34 @@ static void	ft_img_pixel_put(int x, int y, int color)
 void ft_turnX(t_point3d *point, double degree)
 {
 	point->x = point->x;
-	point->y = point->y * cos(degree) + point->z * sin(degree) ;
-	point->z = -point->y * sin(degree) + point->z * cos(degree) ;
+	point->y = point->y * cos(degree) + point->z * sin(degree);
+	point->z = -point->y * sin(degree) + point->z * cos(degree);
 }
 
 void ft_turnY(t_point3d *point, double degree)
 {
 	point->x = point->x * cos(degree) + point->z * sin(degree);
 	point->y = point->y;
-	point->z = -point->x * sin(degree) + point->z * cos(degree) ;
+	point->z = -point->x * sin(degree) + point->z * cos(degree);
 }
 
 void ft_turnZ(t_point3d *point, double degree)
 {
-	point->x = point->x * cos(degree) -  point->y * sin(degree) ;
-	point->y = -point->x * sin(degree) + point->y * cos(degree) ;
+	point->x = point->x * cos(degree) -  point->y * sin(degree);
+	point->y = -point->x * sin(degree) + point->y * cos(degree);
 	point->z = point->z;
 }
 
 
-static void iso(double *x, double *y, double z)
+static void iso(t_point3d *point)
 {
     int previous_x;
     int previous_y;
 
-    previous_x = *x;
-    previous_y = *y;
-    *x = (previous_x - previous_y) * cos(0.523599);
-    *y = -z + (previous_x + previous_y) * sin(0.523599);
+    previous_x = point->x;
+    previous_y = point->y;
+    point->x = (previous_x - previous_y) * cos(0.523599);
+    point->y = -point->z + (previous_x + previous_y) * sin(0.523599);
 }
 
 int ft_is_space(char c)
@@ -181,7 +181,7 @@ void ft_printInput()
 void ft_draw(t_point3d *point, int x, int y)
 {
 	printf("%.0f %.0f %.0f\n", point->x, point->y, point->z);
-	iso(&point->x, &point->y, point->z);
+	iso(point);
 	int color = 0xFFFFFFF;
 	if (point->z != 0)
 	 color = 0xff0000;
@@ -230,6 +230,7 @@ int ft_main(int key, void *param)
 				x = scale;
 			}
 		}
+		printf("END\n\n");
 		mlx_put_image_to_window ( data.mlx_ptr, data.win_ptr, data.img_ptr, 0, 0);
 	return (0);
 }
