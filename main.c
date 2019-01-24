@@ -180,7 +180,7 @@ void ft_printInput()
 
 void ft_draw(t_point3d *point, int x, int y)
 {
-	printf("%.0f %.0f %.0f\n", point->x, point->y, point->z);
+	printf("x:%.0f y:%.0f z:%.0f\n", point->x, point->y, point->z);
 	iso(point);
 	int color = 0xFFFFFFF;
 	if (point->z != 0)
@@ -189,30 +189,39 @@ void ft_draw(t_point3d *point, int x, int y)
 
 }
 
+void ft_handle_keys(t_point3d *point, int key)
+{
+	if (key == 2)
+		point->x += 20;
+	if (key == 0)
+		point->x -= 20;
+	if (key == 13)
+		point->y -= 20;
+	if (key == 1)
+		point->y += 20;
+	if (key == 38)
+		ft_turnX(point, M_PI / 6);
+	if (key == 37)
+		ft_turnY(point, M_PI / 6);
+	if (key == 40)
+		ft_turnZ(point, M_PI / 6);
+}
+
 int ft_main(int key, void *param)
 {
 	// void new = mlx_new_image(data.mlx_ptr, 500 , 500);
 	//
 	// mlx_put_image_to_window (data.mlx_ptr, data.win_ptr, 0, 0);
 		int scale = 10;
-	int x = scale;
-	int y = scale;
+	int x = map.width/2;
+	int y = map.height/2;
 
 	int i = 0;
-	if (key == 2)
-		 	 point.x += 20;
-		if (key == 0)
-			point.x -= 20;
-		if (key == 13)
-				 point.y -= 20;
-		if (key == 1)
-				point.y += 20;
-		if (key == 38)
-			ft_turnX(&point, M_PI/6);
-			if (key == 37)
-				ft_turnY(&point, M_PI/6);
-				if (key == 40)
-					ft_turnZ(&point, M_PI/6);
+	while (i < map.width * map.height)
+		ft_handle_keys(&map.points[i++], key);
+	//ft_handle_keys(&point, key);
+
+	i = 0;
 			printf("x:%f y:%f z:%f key%d\n", point.x, point.y, point.z, key);
 			data.img_ptr = mlx_new_image (data.mlx_ptr, data.w_width, data.w_height);
 			data.img_data = mlx_get_data_addr (data.img_ptr, &data.bits_per_pixel, &data.size_line, &data.endian);
@@ -227,7 +236,7 @@ int ft_main(int key, void *param)
 				y+=scale;
 
 				c = 0;
-				x = scale;
+				x = map.width/2;
 			}
 		}
 		printf("END\n\n");
