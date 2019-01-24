@@ -24,10 +24,12 @@ typedef struct    data_s
 
 typedef struct point_s
 {
-	double x;
-	double y;
-	double z;
+	int x;
+	int y;
+	int z;
 	int size;
+	int x_iso;
+	int  y_iso;
 } t_point3d;
 
 typedef struct map_s
@@ -69,7 +71,7 @@ void ft_turnY(t_point3d *point, double degree)
 
 void ft_turnZ(t_point3d *point, double degree)
 {
-	point->x = point->x * cos(degree) -  point->y * sin(degree);
+	point->x = point->x * cos(degree) - point->y * sin(degree);
 	point->y = -point->x * sin(degree) + point->y * cos(degree);
 	point->z = point->z;
 }
@@ -80,11 +82,22 @@ static void iso(t_point3d *point)
     int previous_x;
     int previous_y;
 
-    previous_x = point->x;
-    previous_y = point->y;
-    point->x = (previous_x - previous_y) * cos(0.523599);
-    point->y = -point->z + (previous_x + previous_y) * sin(0.523599);
+    previous_x = point->x_iso;
+    previous_y = point->y_iso;
+    point->x_iso = (previous_x - previous_y) * cos(0.523599);
+    point->y_iso = -point->z + (previous_x + previous_y) * sin(0.523599);
 }
+
+// static void iso(int *x, int *y, int z)
+// {
+//     int previous_x;
+//     int previous_y;
+//
+//     previous_x = *x;
+//     previous_y = *y;
+//     *x = (previous_x - previous_y) * cos(0.523599);
+//     *y = -z + (previous_x + previous_y) * sin(0.523599);
+// }
 
 int ft_is_space(char c)
 {
@@ -166,7 +179,7 @@ void ft_printInput()
 
 		while (i < map.width * map.height)
 		{
-			printf("%0.f ", map.points[i].z);
+			printf("%d", map.points[i].z);
 					count++;
 			if (count == map.width)
 			{
@@ -180,12 +193,12 @@ void ft_printInput()
 
 void ft_draw(t_point3d *point, int x, int y)
 {
-	printf("x:%.0f y:%.0f z:%.0f\n", point->x, point->y, point->z);
+	printf("x:%d y:%d z:%d\n", point->x, point->y, point->z);
 	iso(point);
 	int color = 0xFFFFFFF;
 	if (point->z != 0)
 	 color = 0xff0000;
-	ft_img_pixel_put( abs(point->x + x), point->y + y,  color);
+	ft_img_pixel_put(point->x_iso + x + 250, point->y_iso + y + 250,  color);
 
 }
 
@@ -200,11 +213,11 @@ void ft_handle_keys(t_point3d *point, int key)
 	if (key == 1)
 		point->y += 20;
 	if (key == 38)
-		ft_turnX(point, M_PI / 6);
+		ft_turnX(point, M_PI / 12);
 	if (key == 37)
-		ft_turnY(point, M_PI / 6);
+		ft_turnY(point, M_PI / 12);
 	if (key == 40)
-		ft_turnZ(point, M_PI / 6);
+		ft_turnZ(point, M_PI / 12);
 }
 
 int ft_main(int key, void *param)
@@ -212,17 +225,19 @@ int ft_main(int key, void *param)
 	// void new = mlx_new_image(data.mlx_ptr, 500 , 500);
 	//
 	// mlx_put_image_to_window (data.mlx_ptr, data.win_ptr, 0, 0);
-		int scale = 10;
-	int x = map.width/2;
-	int y = map.height/2;
+		int scale = 1;
+	int x = map.width / 2;
+	int y = map.height / 2;
 
 	int i = 0;
 	while (i < map.width * map.height)
+	{
 		ft_handle_keys(&map.points[i++], key);
+	}
 	//ft_handle_keys(&point, key);
 
 	i = 0;
-			printf("x:%f y:%f z:%f key%d\n", point.x, point.y, point.z, key);
+			printf("x:%d y:%d z:%d key%d\n", point.x, point.y, point.z, key);
 			data.img_ptr = mlx_new_image (data.mlx_ptr, data.w_width, data.w_height);
 			data.img_data = mlx_get_data_addr (data.img_ptr, &data.bits_per_pixel, &data.size_line, &data.endian);
 		int c = 0;
