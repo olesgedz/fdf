@@ -22,9 +22,11 @@ typedef struct    data_s
 
 typedef struct point_s
 {
-	double x;
-	double y;
-	double z;
+	int x;
+	int y;
+	int z;
+	int x_iso;
+	int y_iso;
 	int size;
 } t_point3d;
 
@@ -74,63 +76,105 @@ void ft_turnZ(t_point3d *point, double degree)
 }
 
 
-static void iso(double *x, double *y, double z)
+static void	iso(t_point3d *point)
 {
-    int previous_x;
-    int previous_y;
-
-    previous_x = *x;
-    previous_y = *y;
-    *x = (previous_x - previous_y) * cos(0.523599);
-    *y = -z + (previous_x + previous_y) * sin(0.523599);
+	int previous_x;
+	int previous_y;
+		printf("x:%d , y:%d, z:%d\n", point->x, point->y, point->z);
+	previous_x = point->x;
+	previous_y = point->y;
+	point->x_iso = (previous_x - previous_y) * cos(0.523599);
+	point->y_iso = -point->z + (previous_x + previous_y) * sin(0.523599);
+	printf("ISO:x:%d , y:%d, z:%d\n", point->x_iso, point->y_iso, point->z);
 }
 
 
-void ft_draw()
+// void ft_draw()
+// {
+// 	int x = 0;
+// 	int y = 0;
+// 	data.img_ptr = mlx_new_image (data.mlx_ptr, data.w_width, data.w_height);
+// 	data.img_data = mlx_get_data_addr (data.img_ptr, &data.bits_per_pixel, &data.size_line, &data.endian);
+// 	int size = 1;
+// 	iso(&point.x, &point.y, point.z);
+// 	while (y < size)
+// 	{
+// 		 x = 0;
+// 		while (x < size)
+// 		{
+// 			//mlx_pixel_put(data.mlx_ptr, data.win_ptr, k+y, j+x, 0xFFFFFF);
+// 			ft_img_pixel_put( point.x + x, point.y + y,  0xFFFFFFF);
+// 			x++;
+// 		}
+// 		y++;
+// 	}
+// 	mlx_put_image_to_window ( data.mlx_ptr, data.win_ptr, data.img_ptr, 0, 0);
+// }
+
+void ft_draw(t_point3d *point, int x, int y)
 {
-	int x = 0;
-	int y = 0;
-	data.img_ptr = mlx_new_image (data.mlx_ptr, data.w_width, data.w_height);
-	data.img_data = mlx_get_data_addr (data.img_ptr, &data.bits_per_pixel, &data.size_line, &data.endian);
-	int size = 1;
-	iso(&point.x, &point.y, point.z);
-	while (y < size)
-	{
-		 x = 0;
-		while (x < size)
-		{
-			//mlx_pixel_put(data.mlx_ptr, data.win_ptr, k+y, j+x, 0xFFFFFF);
-			ft_img_pixel_put( point.x + x, point.y + y,  0xFFFFFFF);
-			x++;
-		}
-		y++;
-	}
-	mlx_put_image_to_window ( data.mlx_ptr, data.win_ptr, data.img_ptr, 0, 0);
+	printf("x:%d y:%d z:%d x_iso:%d, y_iso:%d\n", point->x, point->y, point->z,point->y_iso, point->y_iso);
+	iso(point);
+	int color = 0xFFFFFFF;
+	if (point->z != 0)
+	 color = 0xff0000;
+	ft_img_pixel_put(point->x_iso + x , point->y_iso + y ,  color);
+
 }
 
-
-
+void ft_handle_keys(t_point3d *point, int key)
+{
+	if (key == 2)
+		point->x += 20;
+	if (key == 0)
+		point->x -= 20;
+	if (key == 13)
+		point->y -= 20;
+	if (key == 1)
+		point->y += 20;
+	if (key == 38)
+		ft_turnX(point, M_PI / 12);
+	if (key == 37)
+		ft_turnY(point, M_PI / 12);
+	if (key == 40)
+		ft_turnZ(point, M_PI / 12);
+}
 int ft_main(int key, void *param)
-{
-	// void new = mlx_new_image(data.mlx_ptr, 500 , 500);
+{	// void new = mlx_new_image(data.mlx_ptr, 500 , 500);
 	//
 	// mlx_put_image_to_window (data.mlx_ptr, data.win_ptr, 0, 0);
-	if (key == 2)
-		 	 point.x += 20;
-		if (key == 0)
-			point.x -= 20;
-		if (key == 13)
-				 point.y -= 20;
-		if (key == 1)
-				point.y += 20;
-		if (key == 38)
-			ft_turnX(&point, M_PI/6);
-			if (key == 37)
-				ft_turnY(&point, M_PI/6);
-				if (key == 40)
-					ft_turnZ(&point, M_PI/6);
-			printf("x:%f y:%f z:%f key%d\n", point.x, point.y, point.z, key);
-			ft_draw();
+		int scale = 5;
+	int x = map.width / 2;
+	int y = map.height / 2;
+
+	int i = 0;
+	// while (i < map.width * map.height)
+	// {
+	// 	ft_handle_keys(&map.points[i++], key);
+	// }
+	//ft_handle_keys(&point, key);
+
+	i = 0;
+			printf("x:%d y:%d z:%d key%d\n", point.x, point.y, point.z, key);
+			data.img_ptr = mlx_new_image (data.mlx_ptr, data.w_width, data.w_height);
+			data.img_data = mlx_get_data_addr (data.img_ptr, &data.bits_per_pixel, &data.size_line, &data.endian);
+		int c = 0;
+		while (i < map.width * map.height)
+		{
+			ft_draw(&map.points[i++], x, y);
+			x +=scale;
+			c++;
+			if (c >= map.width)
+			{
+				y+=scale;
+
+				c = 0;
+				x = map.width/2;
+			}
+		}
+		printf("END\n\n");
+		mlx_put_image_to_window ( data.mlx_ptr, data.win_ptr, data.img_ptr, 0, 0);
+	return (0);
 	return (0);
 }
 
@@ -214,7 +258,7 @@ static void		ft_printMap()
 	int count = 0;
 	while (i < map.width * map.height)
 	{
-		printf("%0.f ", map.points[i].z);
+		printf("%d ", map.points[i].z);
 		count++;
 		if (count == map.width)
 		{
@@ -241,9 +285,9 @@ int main(int argc, char **argv)
 				ft_putstr("usage:\n");
 				return (0);
 			}
-			point.x = 0;
-			point.y = 0;
-			point.z = 0;
+			point.x = -47;
+			point.y = 48;
+			point.z = 190;
 			ft_validateMap(argv);
 			ft_save_points(argv);
 			ft_printMap();
@@ -252,8 +296,10 @@ int main(int argc, char **argv)
 			    if ((data.win_ptr = mlx_new_window(data.mlx_ptr, data.w_height, data.w_width, "Hello world")) == NULL)
 					        return (EXIT_FAILURE);
 
+						ft_main(3,(void *)0);
 						printf("%d", mlx_key_hook(data.win_ptr, ft_main, (void *)0));
 					//	mlx_string_put(data.mlx_ptr, data.win_ptr, j, k, 0xFFFFFF, "HELLO");
 				    mlx_loop(data.mlx_ptr);
 					    return (EXIT_SUCCESS);
+				return (0);
 }
