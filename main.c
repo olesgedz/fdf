@@ -44,7 +44,7 @@ t_point3d		point;
 t_map map;
 static void	ft_img_pixel_put(int x, int y, int color)
 {
-	int		i;
+	int		i = 0;
 
 	if ( x < 500 && y < 500)
 	{
@@ -85,7 +85,7 @@ static void iso(t_point3d *point)
     previous_x = point->x_iso;
     previous_y = point->y_iso;
     point->x_iso = (previous_x - previous_y) * cos(0.523599);
-    point->y_iso = -point->z + (previous_x + previous_y) * sin(0.523599);
+    point->y_iso = point->z + (previous_x + previous_y) * sin(0.523599);
 }
 
 // static void iso(int *x, int *y, int z)
@@ -193,12 +193,12 @@ void ft_printInput()
 
 void ft_draw(t_point3d *point, int x, int y)
 {
-	printf("x:%d y:%d z:%d\n", point->x, point->y, point->z);
+	printf("x:%d y:%d z:%d x_iso:%d, y_iso:%d\n", point->x, point->y, point->z,point->y_iso, point->y_iso);
 	iso(point);
 	int color = 0xFFFFFFF;
 	if (point->z != 0)
 	 color = 0xff0000;
-	ft_img_pixel_put(point->x_iso + x + 250, point->y_iso + y + 250,  color);
+	ft_img_pixel_put(point->y_iso + x , point->y_iso + y ,  color);
 
 }
 
@@ -225,15 +225,15 @@ int ft_main(int key, void *param)
 	// void new = mlx_new_image(data.mlx_ptr, 500 , 500);
 	//
 	// mlx_put_image_to_window (data.mlx_ptr, data.win_ptr, 0, 0);
-		int scale = 1;
+		int scale = 5;
 	int x = map.width / 2;
 	int y = map.height / 2;
 
 	int i = 0;
-	while (i < map.width * map.height)
-	{
-		ft_handle_keys(&map.points[i++], key);
-	}
+	// while (i < map.width * map.height)
+	// {
+	// 	ft_handle_keys(&map.points[i++], key);
+	// }
 	//ft_handle_keys(&point, key);
 
 	i = 0;
@@ -269,7 +269,7 @@ int main(int argc, char **argv)
 	data.w_width = 500;
 	data.bits_per_pixel  = 32;
 	data.size_line = 7680;
-	data.endian = 1;
+	data.endian = 0;
 	int fd = 0;
 	if (argc != 2)
 	{
