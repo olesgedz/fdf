@@ -148,10 +148,10 @@ int ft_main(int key, void *param)
 	int y = map.height / 2;
 
 	int i = 0;
-	// while (i < map.width * map.height)
-	// {
-	// 	ft_handle_keys(&map.points[i++], key);
-	// }
+	while (i < map.width * map.height)
+	{
+		ft_handle_keys(&map.points[i++], key);
+	}
 	//ft_handle_keys(&point, key);
 
 	i = 0;
