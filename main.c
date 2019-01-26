@@ -112,14 +112,14 @@ static void	iso(t_point3d *point)
 // 	mlx_put_image_to_window ( data.mlx_ptr, data.win_ptr, data.img_ptr, 0, 0);
 // }
 
-void ft_draw(t_point3d *point, int x, int y)
+void ft_draw(t_point3d *point)
 {
 	//printf("x:%d y:%d z:%d x_iso:%d, y_iso:%d\n", point->x, point->y, point->z,point->y_iso, point->y_iso);
 	iso(point);
 	int color = 0xFFFFFFF;
 	if (point->z != 0)
 	 color = 0xff0000;
-	ft_img_pixel_put(point->x_iso + x , point->y_iso + y ,  color);
+	ft_img_pixel_put(point->x_iso * map.scale, point->y_iso * map.scale,  color);
 
 }
 
@@ -146,13 +146,14 @@ int ft_main(int key, void *param)
 	//
 	// mlx_put_image_to_window (data.mlx_ptr, data.win_ptr, 0, 0);
 
-	int x = map.width / 2;
-	int y = map.height / 2;
+	int x = 1;
+	int y = 1;
 	if (key == 24)
-		map.scale += 5;
+		map.scale += 1;
 		if (key == 27)
-			map.scale -= 5;
-	printf("key: %d\n", key);
+			map.scale -= 1;
+	
+	printf("key: %d scale %d\n", key, map.scale);
 	int i = 0;
 	while (i < map.width * map.height)
 	{
@@ -167,16 +168,7 @@ int ft_main(int key, void *param)
 		int c = 0;
 		while (i < map.width * map.height)
 		{
-			ft_draw(&map.points[i++], x, y);
-			x += map.scale;
-			c++;
-			if (c >= map.width)
-			{
-				y += map.scale;
-
-				c = 0;
-				x = map.width/2;
-			}
+			ft_draw(&map.points[i++]);
 		}
 		printf("END\n\n");
 		mlx_put_image_to_window ( data.mlx_ptr, data.win_ptr, data.img_ptr, 0, 0);
@@ -285,7 +277,7 @@ int main(int argc, char **argv)
 			data.bits_per_pixel  = 32;
 			data.size_line = 7680;
 			data.endian = 1;
-				map.scale = 5;
+				map.scale = 1;
 
 			if (argc != 2)
 			{
