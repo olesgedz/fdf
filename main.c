@@ -76,6 +76,44 @@ void ft_turnZ(t_point3d *point, double degree)
 	point->z = point->z;
 }
 
+static void	rotate_x(t_point3d *point, double alpha)
+{
+	int previous_y;
+
+	previous_y = point->y;
+	point->y = previous_y * cos(alpha) + point->z * sin(alpha);
+	point->z = -previous_y * sin(alpha) + point->z * cos(alpha);
+}
+
+/*
+** Rotate coordinate by y axis
+*/
+
+static void	rotate_y(t_point3d *point, double beta)
+{
+	int previous_x;
+
+	previous_x = point->x;
+	point->x = previous_x * cos(beta) + point->z * sin(beta);
+	point->z = -previous_x * sin(beta) + point->z * cos(beta);
+}
+
+/*
+** Rotate coordinate by z axis
+*/
+
+static void	rotate_z(t_point3d *point, double gamma)
+{
+	int previous_x;
+	int previous_y;
+
+	previous_x = point->x;
+	previous_y = point->y;
+	point->x = previous_x * cos(gamma) - previous_y * sin(gamma);
+	point->y = previous_x * sin(gamma) + previous_y * cos(gamma);
+}
+
+
 
 static void	iso(t_point3d *point)
 {
@@ -133,12 +171,18 @@ void ft_handle_keys(t_point3d *point, int key)
 		point->y -= 20;
 	if (key == 1)
 		point->y += 20;
-	if (key == 38)
-		ft_turnX(point, M_PI / 12);
-	if (key == 37)
+	if (key == 38) //j
+		rotate_x(point, M_PI / 2);
+	if (key == 32) //u
+		rotate_x(point, -M_PI / 2);
+	if (key == 37) //l
 		ft_turnY(point, M_PI / 12);
-	if (key == 40)
+	if (key == 31) //o
+		ft_turnY(point, -M_PI / 12);
+	if (key == 40) //k
 		ft_turnZ(point, M_PI / 12);
+	if (key == 34) //i
+		ft_turnZ(point, -M_PI / 12);
 
 }
 int ft_main(int key, void *param)
