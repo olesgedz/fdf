@@ -152,12 +152,12 @@ static void	iso(t_point3d *point)
 
 void ft_draw(t_point3d *point)
 {
-	//printf("x:%d y:%d z:%d x_iso:%d, y_iso:%d\n", point->x, point->y, point->z,point->y_iso, point->y_iso);
+	printf("x:%d y:%d z:%d x_iso:%d, y_iso:%d\n", point->x, point->y, point->z,point->y_iso, point->y_iso);
 	iso(point);
 	int color = 0xFFFFFFF;
 	if (point->z != 0)
 	 color = 0xff0000;
-	ft_img_pixel_put(point->x_iso * map.scale, point->y_iso * map.scale,  color);
+	ft_img_pixel_put(point->x_iso * map.scale - map.scale, point->y_iso * map.scale - map.scale,  color);
 
 }
 
