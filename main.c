@@ -35,6 +35,7 @@ typedef struct map_s
 	size_t width;
 	size_t height;
 	t_point3d *points;
+	int scale;
 } t_map;
 
 data_t        data;
@@ -80,12 +81,12 @@ static void	iso(t_point3d *point)
 {
 	int previous_x;
 	int previous_y;
-		printf("x:%d , y:%d, z:%d\n", point->x, point->y, point->z);
+		//printf("x:%d , y:%d, z:%d\n", point->x, point->y, point->z);
 	previous_x = point->x;
 	previous_y = point->y;
 	point->x_iso = (previous_x - previous_y) * cos(0.523599);
 	point->y_iso = -point->z + (previous_x + previous_y) * sin(0.523599);
-	printf("ISO:x:%d , y:%d, z:%d\n", point->x_iso, point->y_iso, point->z);
+	//printf("ISO:x:%d , y:%d, z:%d\n", point->x_iso, point->y_iso, point->z);
 }
 
 
@@ -113,7 +114,7 @@ static void	iso(t_point3d *point)
 
 void ft_draw(t_point3d *point, int x, int y)
 {
-	printf("x:%d y:%d z:%d x_iso:%d, y_iso:%d\n", point->x, point->y, point->z,point->y_iso, point->y_iso);
+	//printf("x:%d y:%d z:%d x_iso:%d, y_iso:%d\n", point->x, point->y, point->z,point->y_iso, point->y_iso);
 	iso(point);
 	int color = 0xFFFFFFF;
 	if (point->z != 0)
@@ -138,15 +139,20 @@ void ft_handle_keys(t_point3d *point, int key)
 		ft_turnY(point, M_PI / 12);
 	if (key == 40)
 		ft_turnZ(point, M_PI / 12);
+
 }
 int ft_main(int key, void *param)
 {	// void new = mlx_new_image(data.mlx_ptr, 500 , 500);
 	//
 	// mlx_put_image_to_window (data.mlx_ptr, data.win_ptr, 0, 0);
-		int scale = 5;
+
 	int x = map.width / 2;
 	int y = map.height / 2;
-
+	if (key == 24)
+		map.scale += 5;
+		if (key == 27)
+			map.scale -= 5;
+	printf("key: %d\n", key);
 	int i = 0;
 	while (i < map.width * map.height)
 	{
@@ -155,18 +161,18 @@ int ft_main(int key, void *param)
 	//ft_handle_keys(&point, key);
 
 	i = 0;
-			printf("x:%d y:%d z:%d key%d\n", point.x, point.y, point.z, key);
+			//printf("x:%d y:%d z:%d key%d\n", point.x, point.y, point.z, key);
 			data.img_ptr = mlx_new_image (data.mlx_ptr, data.w_width, data.w_height);
 			data.img_data = mlx_get_data_addr (data.img_ptr, &data.bits_per_pixel, &data.size_line, &data.endian);
 		int c = 0;
 		while (i < map.width * map.height)
 		{
 			ft_draw(&map.points[i++], x, y);
-			x +=scale;
+			x += map.scale;
 			c++;
 			if (c >= map.width)
 			{
-				y+=scale;
+				y += map.scale;
 
 				c = 0;
 				x = map.width/2;
@@ -279,6 +285,7 @@ int main(int argc, char **argv)
 			data.bits_per_pixel  = 32;
 			data.size_line = 7680;
 			data.endian = 1;
+				map.scale = 5;
 
 			if (argc != 2)
 			{
