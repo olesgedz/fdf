@@ -268,7 +268,7 @@ int ft_is_space(char c)
 	return (0);
 }
 
-int ft_countWords(char *s)
+int ft_countwords(char *s)
 {
 	int i;
 	int count;
