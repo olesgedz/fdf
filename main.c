@@ -524,8 +524,8 @@ int			line_process_point(t_mlx *mlx, t_line *l, t_vector *p1,
 	percent = (l->dx > l->dy ?
 			ft_ilerp((int)p1->x, (int)l->start.x, (int)l->stop.x)
 			: ft_ilerp((int)p1->y, (int)l->start.y, (int)l->stop.y));
-	image_set_pixel(mlx->image, (int)p1->x, (int)p1->y, clerp(p1->color,
-				p2->color, percent));
+	image_set_pixel(mlx->image, (int)p1->x, (int)p1->y, 0xff);//clerp(p1->color,
+		//		p2->color, percent)
 	l->err2 = l->err;
 	if (l->err2 > -l->dx)
 	{
@@ -610,10 +610,10 @@ void		render(t_mlx *mlx)
 		while (y < map->height)
 		{
 			v = project_vector(vector_at(map, x, y), mlx);
-			if (x + 1 < map->width)
-				line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
-			if (y + 1 < map->height)
-				line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+			// if (x + 1 < map->width)
+			// 	line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+			// if (y + 1 < map->height)
+			// 	line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
 			y++;
 		}
 		x++;
@@ -621,6 +621,34 @@ void		render(t_mlx *mlx)
 	mlx_put_image_to_window(mlx->mlx, mlx->window, mlx->image->image, 0, 0);
 }
 
+int ft_handle_keys(int key, t_mlx *mlx)
+{
+
+	// if (key == 2)
+	// 	point->x += 20;
+	// if (key == 0)
+	// 	point->x -= 20;
+	// if (key == 13)
+	// 	point->y -= 20;
+	// if (key == 1)
+	// 	point->y += 20;
+	// if (key == 38) //j
+	// 	rotate_x(point, M_PI / 2);
+	// if (key == 32) //u
+	// 	rotate_x(point, -M_PI / 2);
+	// if (key == 37) //l
+	// 	ft_turnY(point, M_PI / 12);
+	// if (key == 31) //o
+	// 	ft_turnY(point, -M_PI / 12);
+	// if (key == 40) //k
+	// 	ft_turnZ(point, M_PI / 12);
+	// if (key == 34) //i
+	// 	ft_turnZ(point, -M_PI / 12);
+	if (key == 2)
+		mlx->cam->offsetx += 20;
+	render(mlx);
+return (0);
+}
 
 int main(int argc, char** argv)
 {
@@ -639,6 +667,7 @@ int main(int argc, char** argv)
 		return (die("error: mlx couldn't init"));
 	mlx->map = map;
 	render(mlx);
+	mlx_key_hook(mlx->window, ft_handle_keys, (void *)mlx);
 	mlx_loop(mlx->mlx);
 	return (0);
 }
