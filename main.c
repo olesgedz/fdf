@@ -598,28 +598,56 @@ int ft_sign(double n)
 {
 	return(n < 0 ? -1 : 1);
 }
+
+void ft_line2(t_mlx *mlx, t_vector p1, t_vector p2)
+{
+	t_line	line;
+
+	p1.x = (int)p1.x;
+	p2.x = (int)p2.x;
+	p1.y = (int)p1.y;
+	p2.y = (int)p2.y;
+	line.start = p1;
+	line.stop = p2;
+	// if (!lineclip(&p1, &p2))
+	// 	return ;
+	line.dx = (int)ft_abs((int)p2.x - (int)p1.x);
+	line.sx = (int)p1.x < (int)p2.x ? 1 : -1;
+	line.dy = (int)ft_abs((int)p2.y - (int)p1.y);
+	line.sy = (int)p1.y < (int)p2.y ? 1 : -1;
+	line.err = (line.dx > line.dy ? line.dx : -line.dy) / 2;
+	printf("%d %d %d %d\n", (int)p1.x,  (int)p2.x, (int)p1.y, (int)p2.y);
+	while (((int)p1.x <= (int)p2.x || (int)p1.y <= (int)p2.y))
+	{
+		if (p1.x < 0 || p1.x >= WIN_WIDTH || p1.y < 0 || p1.y >= WIN_HEIGHT
+			|| p2.x < 0 || p2.x >= WIN_WIDTH || p2.y < 0 || p2.y >= WIN_HEIGHT)
+			image_set_pixel(mlx->image, (int)p1.x, (int)p1.y, 0xff);
+		p1.x++;
+	}
+
+}
 int ft_line(t_mlx *mlx, t_vector v0, t_vector v1)
 {
-	double deltax = v1.x - v0.x;
-	double deltay = v1.y - v0.y;
-	double deltaerr = ABS(deltay / deltax);
-	double error = 0;
-	double y = v0.y;
-	double x = v0.x;
-	//image_set_pixel(mlx->image, (int)x, (int)y, 0xFFFFFF);
-	printf("%f %f\n", x, v1.x);
-	while (x < v1.x)
-	{
-		image_set_pixel(mlx->image, (int)x, (int)y, 0xFFFFFF);
-		error = error + deltaerr;
-		if (error >= 0.5)
-		{
-			y = y + ft_sign(deltay);
-			error = error - 1;
-		}
-		x++;
-	}
-	
+	// double deltax = v1.x - v0.x;
+	// double deltay = v1.y - v0.y;
+	// double deltaerr = ABS(deltay / deltax);
+	// double error = 0;
+	// double y = v0.y;
+	// double x = v0.x;
+	// //image_set_pixel(mlx->image, (int)x, (int)y, 0xFFFFFF);
+	// printf("%f %f\n", x, v1.x);
+	// while (x < v1.x)
+	// {
+	// 	image_set_pixel(mlx->image, (int)x, (int)y, 0xFFFFFF);
+	// 	error = error + deltaerr;
+	// 	if (error >= 0.5)
+	// 	{
+	// 		y = y + ft_sign(deltay);
+	// 		error = error - 1;
+	// 	}
+	// 	x++;
+	// }
+
 	return (0);
 }
 void		render(t_mlx *mlx)
@@ -641,18 +669,23 @@ void		render(t_mlx *mlx)
 			 vector_at(map, x, y).y, vector_at(map, x, y).z);
 			v = project_vector(vector_at(map, x, y), mlx);
 			printf(" iso x: %.0f y: %.0f z: %f\n", v.x, v.y, v.z);
-			// if (x + 1 < map->width)
-			// 	line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
-			// if (y + 1 < map->height)
-			// 	line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
-			// if(vector_at(map, x, y).z == 0)
-			// 	image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xff0000);
-			// else
-			// 	image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xFFFFFF);
 			if (x + 1 < map->width)
-				ft_line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+				line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
 			if (y + 1 < map->height)
-				ft_line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+				line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+
+			// if (x + 1 < map->width)
+			// 	ft_line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+			// if (y + 1 < map->height)
+			// 	ft_line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+				// if(vector_at(map, x, y).z == 0)
+				// 	image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xff0000);
+				// else
+				// 	image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xFFFFFF);
+				// if (x + 1 < map->width)
+				// 	ft_line2(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+				// if (y + 1 < map->height)
+				// 	ft_line2(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
 			y++;
 		}
 		x++;
@@ -685,6 +718,14 @@ int ft_handle_keys(int key, t_mlx *mlx)
 	// 	ft_turnZ(point, -M_PI / 12);
 	if (key == 2)
 		mlx->cam->offsetx += 20;
+	if (key == 38) //j
+		mlx->cam->x += 0.1;
+	if (key == 32) //u
+		mlx->cam->x -= 0.1;
+	if (key == 40) //k
+		mlx->cam->y += 0.1;
+	if (key == 34) //i
+		mlx->cam->y -= 0.1;
 	render(mlx);
 return (0);
 }
