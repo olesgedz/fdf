@@ -428,8 +428,8 @@ t_mlx		*init(char *title)
 		(mlx->mouse = ft_memalloc(sizeof(t_mouse))) == NULL ||
 		(mlx->image = new_image(mlx)) == NULL)
 		return (mlxdel(mlx));
-	mlx->cam->x = 0.5;
-	mlx->cam->y = 0.5;
+	mlx->cam->x = -M_PI/6;
+	mlx->cam->y = -M_PI/6;
 	mlx->cam->scale = 32;
 	mlx->cam->offsetx = WIN_WIDTH / 2;
 	mlx->cam->offsety = WIN_HEIGHT / 2;
@@ -609,12 +609,18 @@ void		render(t_mlx *mlx)
 		y = 0;
 		while (y < map->height)
 		{
+			printf("x: %.0f y: %.0f z: %.0f", vector_at(map, x, y).x,
+			 vector_at(map, x, y).y, vector_at(map, x, y).z);
 			v = project_vector(vector_at(map, x, y), mlx);
+			printf(" iso x: %.0f y: %.0f z: %f\n", v.x, v.y, v.z);
 			// if (x + 1 < map->width)
 			// 	line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
 			// if (y + 1 < map->height)
 			// 	line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
-			image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xff0000);
+			if(vector_at(map, x, y).z == 0)
+				image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xff0000);
+			else
+				image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xFFFFFF);
 			y++;
 		}
 		x++;
