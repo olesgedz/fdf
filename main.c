@@ -614,6 +614,7 @@ void		render(t_mlx *mlx)
 			// 	line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
 			// if (y + 1 < map->height)
 			// 	line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+			image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xff0000);
 			y++;
 		}
 		x++;
