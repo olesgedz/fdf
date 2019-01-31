@@ -7,7 +7,7 @@
 
 # define WIN_WIDTH			1280
 # define WIN_HEIGHT			720
-# define ABS(x) (x < 0 ? -x : x)
+#define abs(x)  ( (x<0) ? -(x) : x )
 
 typedef struct		s_cam
 {
@@ -357,7 +357,7 @@ void		ft_printMap(t_map *map)
 		{
 			while (k < map->width)
 			{
-				if (0 <= ABS(vector_at(map, k, j).z) && ABS(vector_at(map, k, j).z) <= 9)
+				if (0 <= abs(vector_at(map, k, j).z) && abs(vector_at(map, k, j).z) <= 9)
 					printf("%0.f  ", vector_at(map, k, j).z);
 				else
 					printf("%0.f ", vector_at(map, k, j).z);
@@ -756,16 +756,32 @@ void ft_plotline(t_mlx *mlx, t_vector v0, t_vector v1)
 	v1.y = (int)v1.y;
 	line.start = v0;
 	line.end = v1;
-	line.dx = ABS(v1.x - v0.x);
-	line.dy = ABS(v1.y - v0.y);
+	line.dx = (int)abs(v1.x - v0.x);
+	line.dy = (int)abs(v1.y - v0.y);
 	line.err = (line.dx > line.dy ? line.dx : -line.dy) / 2;
-	while ((v0.x != v1.x) || (v0.y != v1.y))
+	while (((int)v0.x != (int)v1.x) || ((int)v0.y != (int)v1.y))
 	{
 		if (ft_put_points(mlx, &line, &v0, &v1))
 			break;
 	}
-
-
+	// t_line	line;
+	//
+	// p1.x = (int)p1.x;
+	// p2.x = (int)p2.x;
+	// p1.y = (int)p1.y;
+	// p2.y = (int)p2.y;
+	// line.start = p1;
+	// line.end = p2;
+	// // if (!lineclip(&p1, &p2))
+	// // 	return ;
+	// line.dx = (int)ABS((int)p2.x - (int)p1.x);
+	// //line.sx = (int)p1.x < (int)p2.x ? 1 : -1;
+	// line.dy = (int)ABS((int)p2.y - (int)p1.y);
+	// //line.sy = (int)p1.y < (int)p2.y ? 1 : -1;
+	// line.err = (line.dx > line.dy ? line.dx : -line.dy) / 2;
+	// while (((int)p1.x != (int)p2.x || (int)p1.y != (int)p2.y))
+	// 	if (ft_put_points(mlx, &line, &p1, &p2))
+	// 		break ;
 }
 void		render(t_mlx *mlx)
 {
