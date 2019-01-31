@@ -62,7 +62,7 @@ typedef struct		s_mlx
 typedef struct		s_line
 {
 	t_vector	start;
-	t_vector	stop;
+	t_vector	end;
 	int			dx;
 	int			dy;
 	int			sx;
@@ -438,8 +438,8 @@ t_mlx		*init(char *title)
 
 void	image_set_pixel(t_image *image, int x, int y, int color)
 {
-	if (x < 0 || x >= WIN_WIDTH || y < 0 || y >= WIN_HEIGHT)
-		return ;
+//	if (x < 0 || x >= WIN_WIDTH || y < 0 || y >= WIN_HEIGHT)
+	//	return ;
 	*(int *)(image->ptr + ((x + y * WIN_WIDTH) * image->bpp)) = color;
 }
 
@@ -521,9 +521,9 @@ int			line_process_point(t_mlx *mlx, t_line *l, t_vector *p1,
 	if (p1->x < 0 || p1->x >= WIN_WIDTH || p1->y < 0 || p1->y >= WIN_HEIGHT
 		|| p2->x < 0 || p2->x >= WIN_WIDTH || p2->y < 0 || p2->y >= WIN_HEIGHT)
 		return (1);
-	percent = (l->dx > l->dy ?
-			ft_ilerp((int)p1->x, (int)l->start.x, (int)l->stop.x)
-			: ft_ilerp((int)p1->y, (int)l->start.y, (int)l->stop.y));
+	// percent = (l->dx > l->dy ?
+	// 		ft_ilerp((int)p1->x, (int)l->start.x, (int)l->stop.x)
+	// 		: ft_ilerp((int)p1->y, (int)l->start.y, (int)l->stop.y));
 	image_set_pixel(mlx->image, (int)p1->x, (int)p1->y, 0xff);//clerp(p1->color,
 		//		p2->color, percent)
 	l->err2 = l->err;
@@ -549,9 +549,9 @@ void		line(t_mlx *mlx, t_vector p1, t_vector p2)
 	p1.y = (int)p1.y;
 	p2.y = (int)p2.y;
 	line.start = p1;
-	line.stop = p2;
-	if (!lineclip(&p1, &p2))
-		return ;
+	line.end = p2;
+	// if (!lineclip(&p1, &p2))
+	// 	return ;
 	line.dx = (int)ft_abs((int)p2.x - (int)p1.x);
 	line.sx = (int)p1.x < (int)p2.x ? 1 : -1;
 	line.dy = (int)ft_abs((int)p2.y - (int)p1.y);
@@ -599,56 +599,173 @@ int ft_sign(double n)
 	return(n < 0 ? -1 : 1);
 }
 
-void ft_line2(t_mlx *mlx, t_vector p1, t_vector p2)
-{
-	t_line	line;
+// void ft_line2(t_mlx *mlx, t_vector p1, t_vector p2)
+// {
+// 	t_line	line;
+//
+// 	p1.x = (int)p1.x;
+// 	p2.x = (int)p2.x;
+// 	p1.y = (int)p1.y;
+// 	p2.y = (int)p2.y;
+// 	line.start = p1;
+// 	line.stop = p2;
+// 	// if (!lineclip(&p1, &p2))
+// 	// 	return ;
+// 	line.dx = (int)ft_abs((int)p2.x - (int)p1.x);
+// 	line.sx = (int)p1.x < (int)p2.x ? 1 : -1;
+// 	line.dy = (int)ft_abs((int)p2.y - (int)p1.y);
+// 	line.sy = (int)p1.y < (int)p2.y ? 1 : -1;
+// 	line.err = (line.dx > line.dy ? line.dx : -line.dy) / 2;
+// 	printf("%d %d %d %d\n", (int)p1.x,  (int)p2.x, (int)p1.y, (int)p2.y);
+// 	while (((int)p1.x <= (int)p2.x || (int)p1.y <= (int)p2.y))
+// 	{
+// 		if (p1.x < 0 || p1.x >= WIN_WIDTH || p1.y < 0 || p1.y >= WIN_HEIGHT
+// 			|| p2.x < 0 || p2.x >= WIN_WIDTH || p2.y < 0 || p2.y >= WIN_HEIGHT)
+// 			image_set_pixel(mlx->image, (int)p1.x, (int)p1.y, 0xff);
+// 		p1.x++;
+// 	}
+// }
 
-	p1.x = (int)p1.x;
-	p2.x = (int)p2.x;
-	p1.y = (int)p1.y;
-	p2.y = (int)p2.y;
-	line.start = p1;
-	line.stop = p2;
-	// if (!lineclip(&p1, &p2))
-	// 	return ;
-	line.dx = (int)ft_abs((int)p2.x - (int)p1.x);
-	line.sx = (int)p1.x < (int)p2.x ? 1 : -1;
-	line.dy = (int)ft_abs((int)p2.y - (int)p1.y);
-	line.sy = (int)p1.y < (int)p2.y ? 1 : -1;
-	line.err = (line.dx > line.dy ? line.dx : -line.dy) / 2;
-	printf("%d %d %d %d\n", (int)p1.x,  (int)p2.x, (int)p1.y, (int)p2.y);
-	while (((int)p1.x <= (int)p2.x || (int)p1.y <= (int)p2.y))
-	{
-		if (p1.x < 0 || p1.x >= WIN_WIDTH || p1.y < 0 || p1.y >= WIN_HEIGHT
-			|| p2.x < 0 || p2.x >= WIN_WIDTH || p2.y < 0 || p2.y >= WIN_HEIGHT)
-			image_set_pixel(mlx->image, (int)p1.x, (int)p1.y, 0xff);
-		p1.x++;
-	}
+// void ft_plotline_high(t_mlx *mlx, t_vector v0, t_vector v1)
+// {
+// 	int dx = v1.x - v0.x;
+// 	int dy = v1.y - v0.y;
+// 	int xi = 1;
+// 	int d = 0;
+// 	int y = 0;
+// 	int x = 0;
+// 	if (dx < 0)
+// 	{
+// 		xi = -1;
+// 		dx = -dx;
+// 	}
+// 	d = 2*dx - dy;
+// 	x  = v0.x;
+// 	y = v0.y;
+// 	while(y < v1.y)
+// 	{
+// 		image_set_pixel(mlx->image, (int)x, (int)y, 0xff);
+// 		if(d > 0)
+// 		{
+// 			x = x + xi;
+// 			d = d - 2*dy;
+// 		}
+// 		d = d + 2*dx;
+// 		y++;
+// 	}
+// }
 
-}
-int ft_line(t_mlx *mlx, t_vector v0, t_vector v1)
+// void ft_plotline_low(t_mlx *mlx, t_vector v0, t_vector v1)
+// {
+// 	int dx = v1.x - v0.x;
+// 	int dy = v1.y - v0.y;
+// 	int yi = 1;
+// 	int d = 0;
+// 	int y = 0;
+// 	int x = 0;
+// 	if (dy < 0)
+// 	{
+// 		yi = -1;
+// 		dy = -dy;
+// 	}
+// 	d = 2*dy - dx;
+// 	y  = v0.y;
+// 	x = v0.x;
+// 	while(x < v1.x)
+// 	{
+// 		image_set_pixel(mlx->image, (int)x, (int)y, 0xff);
+// 		if(d > 0)
+// 		{
+// 			y = y + yi;
+// 			d = d - 2*dx;
+// 		}
+// 		d = d + 2*dy;
+// 		x++;
+//
+// 		}
+// }
+//
+// int ft_plotline(t_mlx *mlx, t_vector v0, t_vector v1)
+// {
+// 	if (ABS(v1.y - v0.y) < ABS(v1.x -v0.x))
+// 	{
+// 		if (v0.x > v1.x)
+// 			ft_plotline_low(mlx, v1, v0);
+// 		else
+// 			ft_plotline_low(mlx, v0, v1);
+// 	}
+// 	else
+// 	{
+// 		if (v0.y > v1.y)
+// 			ft_plotline_high(mlx, v1, v0);
+// 		else
+// 			ft_plotline_high(mlx, v0, v1);
+// 	}
+// 	return (0);
+// }
+// void plotline(t_mlx *mlx, t_vector v0, t_vector v1)
+// {
+// 	int dx = v1.x - v0.x;
+// 	int dy = v1.y - v0.y;
+// 	int d = 2 * dy - dx;
+// 	int y = v0.y;
+// 	int x = v0.x;
+// 	while (x < v1.x)
+// 	{
+// 		image_set_pixel(mlx->image, (int)x, (int)y, 0xff);
+// 		if (d > 0)
+// 		{
+// 			y = y + 1;
+// 			d = d - 2*dx;
+// 		}
+// 		d = d + 2* dy;
+// 		x++;
+// 	}
+// }
+
+
+int ft_put_points(t_mlx *mlx, t_line *l, t_vector *p1,
+		t_vector *p2)
 {
-	double deltax = v1.x - v0.x;
-	double deltay = v1.y - v0.y;
-	double deltaerr = ABS(deltay / deltax);
-	double error = 0;
-	double y = v0.y;
-	double x = v0.x;
-	//image_set_pixel(mlx->image, (int)x, (int)y, 0xFFFFFF);
-	printf("%f %f\n", x, v1.x);
-	while (x < v1.x)
-	{
-		image_set_pixel(mlx->image, (int)x, (int)y, 0xFFFFFF);
-		error = error + deltaerr;
-		if (error >= 0.5)
+	if (p1->x < 0 || p1->x >= WIN_WIDTH || p1->y < 0 || p1->y >= WIN_HEIGHT
+		|| p2->x < 0 || p2->x >= WIN_WIDTH || p2->y < 0 || p2->y >= WIN_HEIGHT)
+		return (1);
+		image_set_pixel(mlx->image, (int)p1->x, (int)p1->y, 0xff);//clerp(p1->color,
+			//		p2->color, percent)
+		l->err2 = l->err;
+		if (l->err2 > -l->dx)
 		{
-			y = y + ft_sign(deltay);
-			error = error - 1;
+			l->err -= l->dy;
+			p1->x += l->sx;
 		}
-		x++;
+		if (l->err2 < l->dy)
+		{
+			l->err += l->dx;
+			p1->y += l->sy;
+		}
+	return (0);
+}
+
+void ft_plotline(t_mlx *mlx, t_vector v0, t_vector v1)
+{
+	t_line line;
+
+	v0.x = (int)v0.x;
+	v0.y = (int)v0.y;
+	v1.x = (int)v1.x;
+	v1.y = (int)v1.y;
+	line.start = v0;
+	line.end = v1;
+	line.dx = ABS(v1.x - v0.x);
+	line.dy = ABS(v1.y - v0.y);
+	line.err = (line.dx > line.dy ? line.dx : -line.dy) / 2;
+	while ((v0.x != v1.x) || (v0.y != v1.y))
+	{
+		if (ft_put_points(mlx, &line, &v0, &v1))
+			break;
 	}
 
-	return (0);
+
 }
 void		render(t_mlx *mlx)
 {
@@ -669,15 +786,15 @@ void		render(t_mlx *mlx)
 			 vector_at(map, x, y).y, vector_at(map, x, y).z);
 			v = project_vector(vector_at(map, x, y), mlx);
 			printf(" iso x: %.0f y: %.0f z: %f\n", v.x, v.y, v.z);
-			// if (x + 1 < map->width)
-			// 	line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
-			// if (y + 1 < map->height)
-			// 	line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
-
 			if (x + 1 < map->width)
-				ft_line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+				line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
 			if (y + 1 < map->height)
-				ft_line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+				line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+
+			// if (x + 1 < map->width)
+			// 	ft_line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+			// if (y + 1 < map->height)
+			// 	ft_line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
 				// if(vector_at(map, x, y).z == 0)
 				// 	image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xff0000);
 				// else
@@ -686,6 +803,10 @@ void		render(t_mlx *mlx)
 				// 	ft_line2(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
 				// if (y + 1 < map->height)
 				// 	ft_line2(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+				if (x + 1 < map->width)
+					ft_plotline(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+				if (y + 1 < map->height)
+					ft_plotline(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
 			y++;
 		}
 		x++;
