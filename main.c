@@ -264,6 +264,10 @@ void		find_depth(t_map *m)
 	m->depth_max = max;
 }
 
+int get_light(int start, int end, double percentage)
+{
+    return ((int)((1 - percentage) * start + percentage * end));
+}
 
 int			clerp(int c1, int c2, double p)
 {
@@ -273,9 +277,9 @@ int			clerp(int c1, int c2, double p)
 
 	if (c1 == c2)
 		return (c1);
-	r = ft_lerpi((c1 >> 16) & 0xFF, (c2 >> 16) & 0xFF, p);
-	g = ft_lerpi((c1 >> 8) & 0xFF, (c2 >> 8) & 0xFF, p);
-	b = ft_lerpi(c1 & 0xFF, c2 & 0xFF, p);
+	r = get_light((c1 >> 16) & 0xFF, (c2 >> 16) & 0xFF, p);
+	g = get_light((c1 >> 8) & 0xFF, (c2 >> 8) & 0xFF, p);
+	b = get_light(c1 & 0xFF, c2 & 0xFF, p);
 	return (r << 16 | g << 8 | b);
 }
 
@@ -438,8 +442,8 @@ t_mlx		*init(char *title)
 
 void	image_set_pixel(t_image *image, int x, int y, int color)
 {
-//	if (x < 0 || x >= WIN_WIDTH || y < 0 || y >= WIN_HEIGHT)
-	//	return ;
+	if (x < 0 || x >= WIN_WIDTH || y < 0 || y >= WIN_HEIGHT)
+		return ;
 	*(int *)(image->ptr + ((x + y * WIN_WIDTH) * image->bpp)) = color;
 }
 
@@ -722,16 +726,29 @@ int ft_sign(double n)
 // 		x++;
 // 	}
 // }
+double percent(int start, int end, int current)
+{
+    double placement;
+    double distance;
 
+    placement = current - start;
+    distance = end - start;
+    return ((distance == 0) ? 1.0 : (placement / distance));
+}
 
 int ft_put_points(t_mlx *mlx, t_line *l, t_vector *p1,
 		t_vector *p2)
 {
+	double percentage;
 	if (p1->x < 0 || p1->x >= WIN_WIDTH || p1->y < 0 || p1->y >= WIN_HEIGHT
 		|| p2->x < 0 || p2->x >= WIN_WIDTH || p2->y < 0 || p2->y >= WIN_HEIGHT)
 		return (1);
-		image_set_pixel(mlx->image, (int)p1->x, (int)p1->y, 0xff);//clerp(p1->color,
-			//		p2->color, percent)
+
+		if (l->dx > l->dy)
+        percentage = percent(l->start.x, l->end.x, p1->x);
+    else
+        percentage = percent(l->start.y, l->end.y, p1->y);
+		image_set_pixel(mlx->image, (int)p1->x, (int)p1->y, clerp(p1->color, p2->color, percentage));
 		l->err2 = l->err;
 		if (l->err2 > -l->dx)
 		{
@@ -746,43 +763,48 @@ int ft_put_points(t_mlx *mlx, t_line *l, t_vector *p1,
 	return (0);
 }
 
-void ft_plotline(t_mlx *mlx, t_vector v0, t_vector v1)
-{
-	t_line line;
+// void		ft_plotline(t_mlx *mlx, t_vector v0, t_vector v1)
+// {
+// 	t_line line;
+//
+// 	v0.x = (int)v0.x;
+// 	v0.y = (int)v0.y;
+// 	v1.x = (int)v1.x;
+// 	v1.y = (int)v1.y;
+// 	line.start = v0;
+// 	line.end = v1;
+// 	line.dx = (int)abs(v1.x - v0.x);
+// 	line.dy = (int)abs(v1.y - v0.y);
+// 	line.err = (line.dx > line.dy ? line.dx : -line.dy) / 2;
+// 	while (((int)v0.x != (int)v1.x) || ((int)v0.y != (int)v1.y))
+// 	{
+// 		if (ft_put_points(mlx, &line, &v0, &v1))
+// 			break ;
+// 	}
+// }
 
-	v0.x = (int)v0.x;
-	v0.y = (int)v0.y;
-	v1.x = (int)v1.x;
-	v1.y = (int)v1.y;
-	line.start = v0;
-	line.end = v1;
-	line.dx = (int)abs(v1.x - v0.x);
-	line.dy = (int)abs(v1.y - v0.y);
+void		ft_plotline(t_mlx *mlx, t_vector p1, t_vector p2)
+{
+	t_line	line;
+
+	p1.x = (int)p1.x;
+	p2.x = (int)p2.x;
+	p1.y = (int)p1.y;
+	p2.y = (int)p2.y;
+	line.start = p1;
+	line.end = p2;
+	// if (!lineclip(&p1, &p2))
+	// 	return ;
+	line.dx = (int)ft_abs((int)p2.x - (int)p1.x);
+	line.sx = (int)p1.x < (int)p2.x ? 1 : -1;
+	line.dy = (int)ft_abs((int)p2.y - (int)p1.y);
+	line.sy = (int)p1.y < (int)p2.y ? 1 : -1;
 	line.err = (line.dx > line.dy ? line.dx : -line.dy) / 2;
-	while (((int)v0.x != (int)v1.x) || ((int)v0.y != (int)v1.y))
-	{
-		if (ft_put_points(mlx, &line, &v0, &v1))
-			break;
-	}
-	// t_line	line;
-	//
-	// p1.x = (int)p1.x;
-	// p2.x = (int)p2.x;
-	// p1.y = (int)p1.y;
-	// p2.y = (int)p2.y;
-	// line.start = p1;
-	// line.end = p2;
-	// // if (!lineclip(&p1, &p2))
-	// // 	return ;
-	// line.dx = (int)ABS((int)p2.x - (int)p1.x);
-	// //line.sx = (int)p1.x < (int)p2.x ? 1 : -1;
-	// line.dy = (int)ABS((int)p2.y - (int)p1.y);
-	// //line.sy = (int)p1.y < (int)p2.y ? 1 : -1;
-	// line.err = (line.dx > line.dy ? line.dx : -line.dy) / 2;
-	// while (((int)p1.x != (int)p2.x || (int)p1.y != (int)p2.y))
-	// 	if (ft_put_points(mlx, &line, &p1, &p2))
-	// 		break ;
+	while (((int)p1.x != (int)p2.x || (int)p1.y != (int)p2.y))
+		if (ft_put_points(mlx, &line, &p1, &p2))
+			break ;
 }
+
 void		render(t_mlx *mlx)
 {
 	int			x;
@@ -802,11 +824,6 @@ void		render(t_mlx *mlx)
 			 vector_at(map, x, y).y, vector_at(map, x, y).z);
 			v = project_vector(vector_at(map, x, y), mlx);
 			printf(" iso x: %.0f y: %.0f z: %f\n", v.x, v.y, v.z);
-			if (x + 1 < map->width)
-				line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
-			if (y + 1 < map->height)
-				line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
-
 			// if (x + 1 < map->width)
 			// 	ft_line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
 			// if (y + 1 < map->height)
