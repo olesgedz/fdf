@@ -421,7 +421,7 @@ t_image	*new_image(t_mlx *mlx)
 	return (img);
 }
 
-t_mlx		*init(char *title)
+t_mlx		*init(char *title, t_map *map)
 {
 	t_mlx	*mlx;
 
@@ -437,7 +437,7 @@ t_mlx		*init(char *title)
 	mlx->cam->x = -M_PI/6;
 	mlx->cam->y = -M_PI/6;
 	mlx->cam->z = 0;
-	mlx->cam->scale = 32;
+	mlx->cam->scale = map->width < 50 ? 32 : 5;
 	mlx->cam->offsetx = WIN_WIDTH / 2;
 	mlx->cam->offsety = WIN_HEIGHT / 2;
 	return (mlx);
@@ -557,8 +557,8 @@ void		line(t_mlx *mlx, t_vector p1, t_vector p2)
 	p2.y = (int)p2.y;
 	line.start = p1;
 	line.end = p2;
-	// if (!lineclip(&p1, &p2))
-	// 	return ;
+	if (!lineclip(&p1, &p2))
+		return ;
 	line.dx = (int)ft_abs((int)p2.x - (int)p1.x);
 	line.sx = (int)p1.x < (int)p2.x ? 1 : -1;
 	line.dy = (int)ft_abs((int)p2.y - (int)p1.y);
@@ -747,10 +747,6 @@ int ft_put_points(t_mlx *mlx, t_line *l, t_vector *p1,
 		t_vector *p2)
 {
 	double percentage;
-	if (p1->x < 0 || p1->x >= WIN_WIDTH || p1->y < 0 || p1->y >= WIN_HEIGHT
-		|| p2->x < 0 || p2->x >= WIN_WIDTH || p2->y < 0 || p2->y >= WIN_HEIGHT)
-		return (1);
-
 		if (l->dx > l->dy)
         percentage = percent(l->start.x, l->end.x, p1->x);
     else
@@ -800,8 +796,6 @@ void		ft_plotline(t_mlx *mlx, t_vector p1, t_vector p2)
 	p2.y = (int)p2.y;
 	line.start = p1;
 	line.end = p2;
-	// if (!lineclip(&p1, &p2))
-	// 	return ;
 	line.dx = (int)ft_abs((int)p2.x - (int)p1.x);
 	line.sx = (int)p1.x < (int)p2.x ? 1 : -1;
 	line.dy = (int)ft_abs((int)p2.y - (int)p1.y);
@@ -916,8 +910,8 @@ int ft_mouse_move(int x, int y, t_mlx *mlx)
 	mlx->mouse->y = y;
 	if (mlx->mouse->isdown == true)
 	{
-		mlx->cam->y += (x - mlx->mouse->lastx) * 0.002;
-		mlx->cam->x -= (y - mlx->mouse->lasty) * 0.002;
+		mlx->cam->y += (x - mlx->mouse->lastx) * 0.005;
+		mlx->cam->x += -(y - mlx->mouse->lasty) * 0.005;
 		render(mlx);
 	}
 	return (0);
@@ -945,7 +939,7 @@ int main(int argc, char** argv)
 	printf("w:%d h:%d\n", map->width, map->height);
 	printf("d_min:%d  d_max:%d\n", map->depth_min, map->depth_max);
 	ft_printMap(map);
-	if ((mlx = init(ft_strjoin("FdF - ", argv[1]))) == NULL)
+	if ((mlx = init(ft_strjoin("FdF - ", argv[1]), map)) == NULL)
 		return (die("error: mlx couldn't init"));
 	mlx->map = map;
 	render(mlx);
