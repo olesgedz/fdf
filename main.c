@@ -824,7 +824,7 @@ void		render(t_mlx *mlx)
 			 vector_at(map, x, y).y, vector_at(map, x, y).z);
 			v = project_vector(vector_at(map, x, y), mlx);
 			printf(" iso x: %.0f y: %.0f z: %f\n", v.x, v.y, v.z);
-			// if (x + 1 < map->width)
+			if (x + 1 < map->width)
 			// 	ft_line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
 			// if (y + 1 < map->height)
 			// 	ft_line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
@@ -832,14 +832,17 @@ void		render(t_mlx *mlx)
 				// 	image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xff0000);
 				// else
 				// 	image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xFFFFFF);
-				// if (x + 1 < map->width)
-				// 	ft_line2(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
-				// if (y + 1 < map->height)
-				// 	ft_line2(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
 				if (x + 1 < map->width)
-					ft_plotline(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+					line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
 				if (y + 1 < map->height)
-					ft_plotline(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+					line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+
+
+
+				// if (x + 1 < map->width)
+				// 	ft_plotline(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+				// if (y + 1 < map->height)
+				// 	ft_plotline(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
 			y++;
 		}
 		x++;
