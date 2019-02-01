@@ -7,6 +7,8 @@
 
 # define WIN_WIDTH			1280
 # define WIN_HEIGHT			720
+# define true					1
+# define false				0
 #define abs(x)  ( (x<0) ? -(x) : x )
 
 typedef struct		s_cam
@@ -15,6 +17,7 @@ typedef struct		s_cam
 	double		offsety;
 	double		x;
 	double		y;
+	double 		z;
 	int			scale;
 	double		**matrix;
 }					t_cam;
@@ -219,7 +222,6 @@ static int	get_lines(int fd, t_list **lst)
 	if (expected == -1 || ret == -1)
 		return (cleanup(lst, NULL));
 	ft_lstrev(lst);
-//	ft_lstprint(*lst);
 	return (1);
 }
 t_vector	*get_vector(int x, int y, char *str)
@@ -434,6 +436,7 @@ t_mlx		*init(char *title)
 		return (mlxdel(mlx));
 	mlx->cam->x = -M_PI/6;
 	mlx->cam->y = -M_PI/6;
+	mlx->cam->z = 0;
 	mlx->cam->scale = 32;
 	mlx->cam->offsetx = WIN_WIDTH / 2;
 	mlx->cam->offsety = WIN_HEIGHT / 2;
@@ -581,6 +584,10 @@ t_vector	rotate(t_vector p, t_cam *r)
 	z = v.z;
 	v.y = cos(r->x) * y - sin(r->x) * z;
 	v.z = sin(r->x) * y + cos(r->x) * z;
+	x = v.x;
+	y = v.y;
+	v.x = cos(r->z) * x - sin(r->z) * y;
+	v.y = sin(r->z) * x + cos(r->z) * y;
 	v.color = p.color;
 	return (v);
 }
@@ -824,25 +831,21 @@ void		render(t_mlx *mlx)
 			 vector_at(map, x, y).y, vector_at(map, x, y).z);
 			v = project_vector(vector_at(map, x, y), mlx);
 			printf(" iso x: %.0f y: %.0f z: %f\n", v.x, v.y, v.z);
-			if (x + 1 < map->width)
-			// 	ft_line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
-			// if (y + 1 < map->height)
-			// 	ft_line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
 				// if(vector_at(map, x, y).z == 0)
 				// 	image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xff0000);
 				// else
 				// 	image_set_pixel(mlx->image, (int)v.x, (int)v.y, 0xFFFFFF);
-				if (x + 1 < map->width)
-					line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
-				if (y + 1 < map->height)
-					line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
-
-
-
 				// if (x + 1 < map->width)
-				// 	ft_plotline(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+				// 	line(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
 				// if (y + 1 < map->height)
-				// 	ft_plotline(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+				// 	line(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
+
+
+
+				if (x + 1 < map->width)
+					ft_plotline(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+				if (y + 1 < map->height)
+					ft_plotline(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
 			y++;
 		}
 		x++;
@@ -863,16 +866,21 @@ int ft_handle_keys(int key, t_mlx *mlx)
 	// 	point->y += 20;
 	// if (key == 38) //j
 	// 	rotate_x(point, M_PI / 2);
-	// if (key == 32) //u
-	// 	rotate_x(point, -M_PI / 2);
+	if (key == 32) //u
+		mlx->cam->scale -= 0.5;
 	// if (key == 37) //l
 	// 	ft_turnY(point, M_PI / 12);
-	// if (key == 31) //o
-	// 	ft_turnY(point, -M_PI / 12);
+	if (key == 31) //o
+	{
+		printf("lol");
+		mlx->cam->scale += 1.5;
+	}
 	// if (key == 40) //k
 	// 	ft_turnZ(point, M_PI / 12);
-	// if (key == 34) //i
-	// 	ft_turnZ(point, -M_PI / 12);
+	if (key == 46) //n
+		mlx->cam->z -= 0.1;
+	if (key == 43) //n
+		mlx->cam->z += 0.1;
 	if (key == 2)
 		mlx->cam->offsetx += 20;
 	if (key == 34) //j 38
@@ -888,6 +896,42 @@ int ft_handle_keys(int key, t_mlx *mlx)
 return (0);
 }
 
+int ft_mouse_press(int button, int x, int y, t_mlx *mlx)
+{
+	mlx->mouse->isdown = true;
+	return (0);
+}
+
+int ft_mouse_release(int button, int x, int y, t_mlx *mlx)
+{
+	mlx->mouse->isdown = false;
+	return (0);
+}
+
+int ft_mouse_move(int x, int y, t_mlx *mlx)
+{
+	mlx->mouse->lastx = mlx->mouse->x;
+	mlx->mouse->lasty = mlx->mouse->y;
+	mlx->mouse->x = x;
+	mlx->mouse->y = y;
+	if (mlx->mouse->isdown == true)
+	{
+		mlx->cam->y += (x - mlx->mouse->lastx) * 0.002;
+		mlx->cam->x -= (y - mlx->mouse->lasty) * 0.002;
+		render(mlx);
+	}
+	return (0);
+}
+
+int ft_mlx_hooks(t_mlx *mlx)
+{
+	mlx_key_hook(mlx->window, ft_handle_keys, (void *)mlx);
+	mlx_mouse_hook (mlx->window, ft_mouse_press, (void *)mlx);
+	mlx_hook(mlx->window, 5, 0, ft_mouse_release, (void *)mlx);
+	mlx_hook(mlx->window, 6, 0, ft_mouse_move, (void *)mlx);
+	
+	return (0);
+}
 int main(int argc, char** argv)
 {
 	t_map	*map;
@@ -905,7 +949,7 @@ int main(int argc, char** argv)
 		return (die("error: mlx couldn't init"));
 	mlx->map = map;
 	render(mlx);
-	mlx_key_hook(mlx->window, ft_handle_keys, (void *)mlx);
+	ft_mlx_hooks(mlx);
 	mlx_loop(mlx->mlx);
 	return (0);
 }
