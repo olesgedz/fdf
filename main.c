@@ -7,6 +7,18 @@
 
 # define WIN_WIDTH			1280
 # define WIN_HEIGHT			720
+#define W_KEY 13
+#define A_KEY 0
+#define S_KEY 1
+#define D_KEY 2
+#define U_KEY 32
+#define I_KEY 34
+#define O_KEY 31
+#define J_KEY 38
+#define K_KEY 40
+#define L_KEY 37
+#define M_KEY 46
+#define L_AR_KEY 43
 # define true					1
 # define false				0
 #define abs(x)  ( (x<0) ? -(x) : x )
@@ -52,6 +64,21 @@ typedef struct		s_image
 	int			stride;
 	int			endian;
 }					t_image;
+typedef struct s_keyboard
+{
+	int w;
+	int a;
+	int s;
+	int d;
+	int u;
+	int i;
+	int o;
+	int j;
+	int k;
+	int l;
+	int m;
+	int l_ar;
+} t_keyboard;
 typedef struct		s_mlx
 {
 	void		*mlx;
@@ -60,6 +87,7 @@ typedef struct		s_mlx
 	t_map		*map;
 	t_cam		*cam;
 	t_mouse		*mouse;
+	t_keyboard *keyboard;
 	double		**zbuf;
 }					t_mlx;
 typedef struct		s_line
@@ -432,10 +460,11 @@ t_mlx		*init(char *title, t_map *map)
 			WIN_HEIGHT, title)) == NULL ||
 		(mlx->cam = ft_memalloc(sizeof(t_cam))) == NULL ||
 		(mlx->mouse = ft_memalloc(sizeof(t_mouse))) == NULL ||
+		(mlx->keyboard = ft_memalloc(sizeof(t_mouse))) == NULL ||
 		(mlx->image = new_image(mlx)) == NULL)
 		return (mlxdel(mlx));
-	mlx->cam->x = -M_PI/6;
-	mlx->cam->y = -M_PI/6;
+	mlx->cam->x = -M_PI / 6;
+	mlx->cam->y = -M_PI / 6;
 	mlx->cam->z = 0;
 	mlx->cam->scale = map->width < 50 ? 32 : 5;
 	mlx->cam->offsetx = WIN_WIDTH / 2;
@@ -571,67 +600,94 @@ void		render(t_mlx *mlx)
 	mlx_put_image_to_window(mlx->mlx, mlx->window, mlx->image->image, 0, 0);
 }
 
-int ft_handle_keys(int key, t_mlx *mlx)
+void ft_press_move(t_mlx *mlx)
 {
-	if (key == 2)
+	if (mlx->keyboard->d == true)
 		mlx->cam->offsetx += 20;
-	if (key == 0)
+	if (mlx->keyboard->a == true)
 		mlx->cam->offsetx -= 20;
-	if (key == 13)
-		mlx->cam->offsety -= 20;
-	if (key == 1)
+	if (mlx->keyboard->s == true)
 		mlx->cam->offsety += 20;
-	if (key == 32) //u
+	if (mlx->keyboard->w == true)
+		mlx->cam->offsety -= 20;
+	if (mlx->keyboard->u == true)
 		mlx->cam->scale -= 0.5;
-	if (key == 31) //o
+	if (mlx->keyboard->o == true)
 		mlx->cam->scale += 1.5;
-	if (key == 46) //n
+	if (mlx->keyboard->m == true)
 		mlx->cam->z -= 0.1;
-	if (key == 43) //n
+	if (mlx->keyboard->l_ar == true)
 		mlx->cam->z += 0.1;
-	if (key == 34) //j 38
+	if (mlx->keyboard->i == true)
 		mlx->cam->x += 0.1;
-	if (key == 38) //u
+	if (mlx->keyboard->j == true)
 		mlx->cam->y -= 0.1;
-	if (key == 40) //k
+	if (mlx->keyboard->k == true)
 		mlx->cam->x -= 0.1;
-	if (key == 37) //i 34 l 37
+	if (mlx->keyboard->l == true)
 		mlx->cam->y += 0.1;
-	printf("key:%d", key);
-	render(mlx);
-return (0);
+}
+
+int ft_handle_keys_press(int key, t_mlx *mlx)
+{
+	if (key == W_KEY)
+		mlx->keyboard->w = true;
+	if (key == A_KEY)
+		mlx->keyboard->a = true;
+	if (key == S_KEY)
+		mlx->keyboard->s = true;
+	if (key == D_KEY)
+		mlx->keyboard->d = true;
+	if (key == U_KEY)
+		mlx->keyboard->u = true;
+	if (key == I_KEY)
+		mlx->keyboard->i = true;
+	if (key == O_KEY)
+		mlx->keyboard->o = true;
+	if (key == J_KEY)
+		mlx->keyboard->j = true;
+	if (key == K_KEY)
+		mlx->keyboard->k = true;
+	if (key == L_KEY)
+		mlx->keyboard->l = true;
+	if (key == M_KEY)
+		mlx->keyboard->m = true;
+	if (key == L_AR_KEY)
+		mlx->keyboard->l_ar = true;
+	ft_press_move(mlx);
+		render(mlx);
+	return (0);
 }
 
 
-int ft_handle_keys(int key, t_mlx *mlx)
+int ft_handle_keys_release(int key, t_mlx *mlx)
 {
-	if (key == 2)
-		mlx->cam->offsetx += 20;
-	if (key == 0)
-		mlx->cam->offsetx -= 20;
-	if (key == 13)
-		mlx->cam->offsety -= 20;
-	if (key == 1)
-		mlx->cam->offsety += 20;
-	if (key == 32) //u
-		mlx->cam->scale -= 0.5;
-	if (key == 31) //o
-		mlx->cam->scale += 1.5;
-	if (key == 46) //n
-		mlx->cam->z -= 0.1;
-	if (key == 43) //n
-		mlx->cam->z += 0.1;
-	if (key == 34) //j 38
-		mlx->cam->x += 0.1;
-	if (key == 38) //u
-		mlx->cam->y -= 0.1;
-	if (key == 40) //k
-		mlx->cam->x -= 0.1;
-	if (key == 37) //i 34 l 37
-		mlx->cam->y += 0.1;
-	printf("key:%d", key);
+	if (key == W_KEY)
+		mlx->keyboard->w = false;
+	if (key == A_KEY)
+		mlx->keyboard->a = false;
+	if (key == S_KEY)
+		mlx->keyboard->s = false;
+	if (key == D_KEY)
+		mlx->keyboard->d = false;
+	if (key == U_KEY)
+		mlx->keyboard->u = false;
+	if (key == I_KEY)
+		mlx->keyboard->i = false;
+	if (key == O_KEY)
+		mlx->keyboard->o = false;
+	if (key == J_KEY)
+		mlx->keyboard->j = false;
+	if (key == K_KEY)
+		mlx->keyboard->k = false;
+	if (key == L_KEY)
+		mlx->keyboard->l = false;
+	if (key == M_KEY)
+		mlx->keyboard->m = false;
+	if (key == L_AR_KEY)
+		mlx->keyboard->l_ar = false;
 	render(mlx);
-return (0);
+	return (0);
 }
 
 int ft_mouse_press(int button, int x, int y, t_mlx *mlx)
@@ -663,8 +719,9 @@ int ft_mouse_move(int x, int y, t_mlx *mlx)
 
 int ft_mlx_hooks(t_mlx *mlx)
 {
-	mlx_key_hook(mlx->window, ft_handle_keys_press, (void *)mlx);
-	mlx_hook(mlx->window, 3, 0, ft_handle_keys_release, (void *)mlx);
+	mlx_hook(mlx->window, 2, 0, ft_handle_keys_press, (void *)mlx);
+	 mlx_hook(mlx->window, 3, 0, ft_handle_keys_release, (void *)mlx);
+
 	mlx_mouse_hook (mlx->window, ft_mouse_press, (void *)mlx);
 	mlx_hook(mlx->window, 5, 0, ft_mouse_release, (void *)mlx);
 	mlx_hook(mlx->window, 6, 0, ft_mouse_move, (void *)mlx);
