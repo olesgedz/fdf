@@ -6,7 +6,7 @@
 /*   By: jblack-b <jblack-b@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 17:14:14 by jblack-b          #+#    #+#             */
-/*   Updated: 2019/02/04 17:19:23 by jblack-b         ###   ########.fr       */
+/*   Updated: 2019/02/04 19:34:53 by jblack-b         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,9 @@
 #include <limits.h>
 #include <math.h>
 
-#define WIN_WIDTH			1280
+#define WIN_WIDTH			1680
 #define WIN_HEIGHT			720
+#define MENU_WIDTH		400
 #define W_KEY 13
 #define A_KEY 0
 #define S_KEY 1
@@ -31,9 +32,9 @@
 #define L_KEY 37
 #define M_KEY 46
 #define L_AR_KEY 43
-#define true					1
-#define false				0
-#define abs(x)  ( (x<0) ? -(x) : x )
+#define TRUE		1
+#define FALSE		0
+#define ABS(x)  ( (x < 0) ? -(x) : x )
 
 typedef struct		s_cam
 {
@@ -114,17 +115,39 @@ typedef struct		s_line
 	int			err2;
 }					t_line;
 
-int		die(char *reason)
+int		ft_error(char *reason)
 {
 	ft_putendl(reason);
 	return (1);
 }
 
-int		ft_lerpi(int first, int second, double p)
+int		get_light(int start, int end, double percentage)
 {
-	if (first == second)
-		return (first);
-	return ((int)((double)first + (second - first) * p));
+	return ((int)((1 - percentage) * start + percentage * end));
+}
+
+double		percent(int start, int end, int current)
+{
+	double placement;
+	double distance;
+
+	placement = current - start;
+	distance = end - start;
+	return ((distance == 0) ? 1.0 : (placement / distance));
+}
+
+int			ft_get_color(int c1, int c2, double p)
+{
+	int r;
+	int g;
+	int b;
+
+	if (c1 == c2)
+		return (c1);
+	r = get_light((c1 >> 16) & 0xFF, (c2 >> 16) & 0xFF, p);
+	g = get_light((c1 >> 8) & 0xFF, (c2 >> 8) & 0xFF, p);
+	b = get_light(c1 & 0xFF, c2 & 0xFF, p);
+	return (r << 16 | g << 8 | b);
 }
 
 size_t	ft_lstcount(t_list *lst)
@@ -184,15 +207,6 @@ size_t	ft_countwords(char *str, char sep)
 			i++;
 	}
 	return (result);
-}
-
-double	ft_ilerp(double val, double first, double second)
-{
-	if (val == first)
-		return (0.0);
-	if (val == second)
-		return (1.0);
-	return ((val - first) / (second - first));
 }
 
 static int	cleanup(t_list **lst, t_map **map)
@@ -302,25 +316,6 @@ void		find_depth(t_map *m)
 	m->depth_max = max;
 }
 
-int		get_light(int start, int end, double percentage)
-{
-	return ((int)((1 - percentage) * start + percentage * end));
-}
-
-int			clerp(int c1, int c2, double p)
-{
-	int r;
-	int g;
-	int b;
-
-	if (c1 == c2)
-		return (c1);
-	r = get_light((c1 >> 16) & 0xFF, (c2 >> 16) & 0xFF, p);
-	g = get_light((c1 >> 8) & 0xFF, (c2 >> 8) & 0xFF, p);
-	b = get_light(c1 & 0xFF, c2 & 0xFF, p);
-	return (r << 16 | g << 8 | b);
-}
-
 t_vector	vector_at(t_map *map, int x, int y)
 {
 	return (*map->vectors[y * map->width + x]);
@@ -338,8 +333,8 @@ void		fill_colors(t_map *m)
 		while (v.x < m->width)
 		{
 			cur = m->vectors[(int)v.y * m->width + (int)v.x];
-			cur->color = clerp(0xFF0000, 0xFFFFFF, ft_ilerp(cur->z,
-				m->depth_min, m->depth_max));
+			cur->color = ft_get_color(0xFF0000, 0xFFFFFF, (cur->z -
+				m->depth_min) / (m->depth_max - m->depth_min));
 			v.x++;
 		}
 		v.y++;
@@ -473,14 +468,14 @@ t_mlx		*init(char *title, t_map *map)
 	mlx->cam->y = -M_PI / 6;
 	mlx->cam->z = 0;
 	mlx->cam->scale = map->width < 50 ? 32 : 5;
-	mlx->cam->offsetx = WIN_WIDTH / 2;
+	mlx->cam->offsetx = (WIN_WIDTH - MENU_WIDTH) / 2;
 	mlx->cam->offsety = WIN_HEIGHT / 2;
 	return (mlx);
 }
 
 void	image_set_pixel(t_image *image, int x, int y, int color)
 {
-	if (x < 0 || x >= WIN_WIDTH || y < 0 || y >= WIN_HEIGHT)
+	if (x < 0 || x >= WIN_WIDTH - MENU_WIDTH || y < 0 || y >= WIN_HEIGHT)
 		return ;
 	*(int *)(image->ptr + ((x + y * WIN_WIDTH) * image->bpp)) = color;
 }
@@ -526,16 +521,6 @@ int		ft_sign(double n)
 	return (n < 0 ? -1 : 1);
 }
 
-double		percent(int start, int end, int current)
-{
-	double placement;
-	double distance;
-
-	placement = current - start;
-	distance = end - start;
-	return ((distance == 0) ? 1.0 : (placement / distance));
-}
-
 int		ft_put_points(t_mlx *mlx, t_line *l, t_vector *p1, t_vector *p2)
 {
 	double percentage;
@@ -545,7 +530,7 @@ int		ft_put_points(t_mlx *mlx, t_line *l, t_vector *p1, t_vector *p2)
 	else
 		percentage = percent(l->start.y, l->end.y, p1->y);
 	image_set_pixel(mlx->image, (int)p1->x,
-	(int)p1->y, clerp(p1->color, p2->color, percentage));
+	(int)p1->y, ft_get_color(p1->color, p2->color, percentage));
 	l->err2 = l->err;
 	if (l->err2 > -l->dx)
 	{
@@ -570,15 +555,49 @@ void		ft_plotline(t_mlx *mlx, t_vector p1, t_vector p2)
 	p2.y = (int)p2.y;
 	line.start = p1;
 	line.end = p2;
-	line.dx = (int)abs((int)p2.x - (int)p1.x);
+	line.dx = (int)ABS((int)p2.x - (int)p1.x);
 	line.sx = (int)p1.x < (int)p2.x ? 1 : -1;
-	line.dy = (int)abs((int)p2.y - (int)p1.y);
+	line.dy = (int)ABS((int)p2.y - (int)p1.y);
 	line.sy = (int)p1.y < (int)p2.y ? 1 : -1;
 	line.err = (line.dx > line.dy ? line.dx : -line.dy) / 2;
 	while (((int)p1.x != (int)p2.x || (int)p1.y != (int)p2.y))
 		if (ft_put_points(mlx, &line, &p1, &p2))
 			break ;
 }
+
+void		ft_draw_menu(t_mlx *mlx)
+{
+	int		y;
+
+	y = 0;
+	mlx_string_put(mlx->mlx, mlx->window, WIN_WIDTH - MENU_WIDTH, 0, 0xFFFFFFF, "How to Use");
+}
+
+
+static void	ft_draw_background(t_mlx *mlx)
+{
+	t_image *image;
+	int	i;
+
+	clear_image(mlx->image);
+	image = mlx->image;
+	int j  = 0;
+	int k = 0;
+	while ( j < WIN_HEIGHT)
+	{
+		k = 0;
+		while ( k < WIN_WIDTH)
+		{
+			if (k  < WIN_WIDTH - MENU_WIDTH)
+				*(int *)(image->ptr + ((k + j * WIN_WIDTH) * image->bpp)) = 0x1E1E1E;
+			else
+				*(int *)(image->ptr + ((k + j * WIN_WIDTH) * image->bpp)) = 0x222222;
+			k++;
+		}
+		j++;
+	}
+}
+
 
 void		render(t_mlx *mlx)
 {
@@ -588,8 +607,9 @@ void		render(t_mlx *mlx)
 	t_map		*map;
 
 	map = mlx->map;
-	clear_image(mlx->image);
 	x = 0;
+	ft_draw_background(mlx);
+	ft_draw_menu(mlx);
 	while (x < map->width)
 	{
 		y = 0;
@@ -607,62 +627,63 @@ void		render(t_mlx *mlx)
 		x++;
 	}
 	mlx_put_image_to_window(mlx->mlx, mlx->window, mlx->image->image, 0, 0);
+		ft_draw_menu(mlx);
 }
 
 void		ft_press_move(t_mlx *mlx)
 {
-	if (mlx->keyboard->d == true)
+	if (mlx->keyboard->d == TRUE)
 		mlx->cam->offsetx += 20;
-	if (mlx->keyboard->a == true)
+	if (mlx->keyboard->a == TRUE)
 		mlx->cam->offsetx -= 20;
-	if (mlx->keyboard->s == true)
+	if (mlx->keyboard->s == TRUE)
 		mlx->cam->offsety += 20;
-	if (mlx->keyboard->w == true)
+	if (mlx->keyboard->w == TRUE)
 		mlx->cam->offsety -= 20;
-	if (mlx->keyboard->u == true)
+	if (mlx->keyboard->u == TRUE)
 		mlx->cam->scale -= 0.5;
-	if (mlx->keyboard->o == true)
+	if (mlx->keyboard->o == TRUE)
 		mlx->cam->scale += 1.5;
-	if (mlx->keyboard->m == true)
+	if (mlx->keyboard->m == TRUE)
 		mlx->cam->z -= 0.1;
-	if (mlx->keyboard->l_ar == true)
+	if (mlx->keyboard->l_ar == TRUE)
 		mlx->cam->z += 0.1;
-	if (mlx->keyboard->i == true)
+	if (mlx->keyboard->i == TRUE)
 		mlx->cam->x += 0.1;
-	if (mlx->keyboard->j == true)
+	if (mlx->keyboard->j == TRUE)
 		mlx->cam->y -= 0.1;
-	if (mlx->keyboard->k == true)
+	if (mlx->keyboard->k == TRUE)
 		mlx->cam->x -= 0.1;
-	if (mlx->keyboard->l == true)
+	if (mlx->keyboard->l == TRUE)
 		mlx->cam->y += 0.1;
 }
 
 int		ft_handle_keys_press(int key, t_mlx *mlx)
 {
 	if (key == W_KEY)
-		mlx->keyboard->w = true;
+		mlx->keyboard->w = TRUE;
 	if (key == A_KEY)
-		mlx->keyboard->a = true;
+		mlx->keyboard->a = TRUE;
 	if (key == S_KEY)
-		mlx->keyboard->s = true;
+		mlx->keyboard->s = TRUE;
 	if (key == D_KEY)
-		mlx->keyboard->d = true;
+		mlx->keyboard->d = TRUE;
 	if (key == U_KEY)
-		mlx->keyboard->u = true;
+		mlx->keyboard->u = TRUE;
 	if (key == I_KEY)
-		mlx->keyboard->i = true;
+		mlx->keyboard->i = TRUE;
 	if (key == O_KEY)
-		mlx->keyboard->o = true;
+		mlx->keyboard->o = TRUE;
 	if (key == J_KEY)
-		mlx->keyboard->j = true;
+		mlx->keyboard->j = TRUE;
 	if (key == K_KEY)
-		mlx->keyboard->k = true;
+		mlx->keyboard->k = TRUE;
 	if (key == L_KEY)
-		mlx->keyboard->l = true;
+		mlx->keyboard->l = TRUE;
 	if (key == M_KEY)
-		mlx->keyboard->m = true;
+		mlx->keyboard->m = TRUE;
 	if (key == L_AR_KEY)
-		mlx->keyboard->l_ar = true;
+		mlx->keyboard->l_ar = TRUE;
 	ft_press_move(mlx);
 	render(mlx);
 	return (0);
@@ -671,42 +692,42 @@ int		ft_handle_keys_press(int key, t_mlx *mlx)
 int		ft_handle_keys_release(int key, t_mlx *mlx)
 {
 	if (key == W_KEY)
-		mlx->keyboard->w = false;
+		mlx->keyboard->w = FALSE;
 	if (key == A_KEY)
-		mlx->keyboard->a = false;
+		mlx->keyboard->a = FALSE;
 	if (key == S_KEY)
-		mlx->keyboard->s = false;
+		mlx->keyboard->s = FALSE;
 	if (key == D_KEY)
-		mlx->keyboard->d = false;
+		mlx->keyboard->d = FALSE;
 	if (key == U_KEY)
-		mlx->keyboard->u = false;
+		mlx->keyboard->u = FALSE;
 	if (key == I_KEY)
-		mlx->keyboard->i = false;
+		mlx->keyboard->i = FALSE;
 	if (key == O_KEY)
-		mlx->keyboard->o = false;
+		mlx->keyboard->o = FALSE;
 	if (key == J_KEY)
-		mlx->keyboard->j = false;
+		mlx->keyboard->j = FALSE;
 	if (key == K_KEY)
-		mlx->keyboard->k = false;
+		mlx->keyboard->k = FALSE;
 	if (key == L_KEY)
-		mlx->keyboard->l = false;
+		mlx->keyboard->l = FALSE;
 	if (key == M_KEY)
-		mlx->keyboard->m = false;
+		mlx->keyboard->m = FALSE;
 	if (key == L_AR_KEY)
-		mlx->keyboard->l_ar = false;
+		mlx->keyboard->l_ar = FALSE;
 	render(mlx);
 	return (0);
 }
 
 int		ft_mouse_press(int button, int x, int y, t_mlx *mlx)
 {
-	mlx->mouse->isdown = true;
+	mlx->mouse->isdown = TRUE;
 	return (0);
 }
 
 int		ft_mouse_release(int button, int x, int y, t_mlx *mlx)
 {
-	mlx->mouse->isdown = false;
+	mlx->mouse->isdown = FALSE;
 	return (0);
 }
 
@@ -716,7 +737,7 @@ int		ft_mouse_move(int x, int y, t_mlx *mlx)
 	mlx->mouse->lasty = mlx->mouse->y;
 	mlx->mouse->x = x;
 	mlx->mouse->y = y;
-	if (mlx->mouse->isdown == true)
+	if (mlx->mouse->isdown == TRUE)
 	{
 		mlx->cam->y += (x - mlx->mouse->lastx) * 0.005;
 		mlx->cam->x += -(y - mlx->mouse->lasty) * 0.005;
@@ -745,9 +766,9 @@ int		main(int argc, char **argv)
 	if (argc != 2)
 		ft_putstr("usage:./fdf map.fdf\n");
 	if (fd < 0 || !read_file(fd, &map))
-		return (die("error: invalid file"));
+		return (ft_error("error: invalid file"));
 	if ((mlx = init(ft_strjoin("FdF - ", argv[1]), map)) == NULL)
-		return (die("error: mlx couldn't init"));
+		return (ft_error("error: mlx couldn't init"));
 	mlx->map = map;
 	render(mlx);
 	ft_mlx_hooks(mlx);
