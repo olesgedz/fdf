@@ -1,12 +1,24 @@
-# include "../minilibx_macos/mlx.h"
-# include <stdio.h>
-# include <fcntl.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jblack-b <jblack-b@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/02/04 17:14:14 by jblack-b          #+#    #+#             */
+/*   Updated: 2019/02/04 17:19:23 by jblack-b         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minilibx_macos/mlx.h"
+#include <stdio.h>
+#include <fcntl.h>
 #include "libft/includes/libft.h"
 #include <limits.h>
 #include <math.h>
 
-# define WIN_WIDTH			1280
-# define WIN_HEIGHT			720
+#define WIN_WIDTH			1280
+#define WIN_HEIGHT			720
 #define W_KEY 13
 #define A_KEY 0
 #define S_KEY 1
@@ -19,8 +31,8 @@
 #define L_KEY 37
 #define M_KEY 46
 #define L_AR_KEY 43
-# define true					1
-# define false				0
+#define true					1
+#define false				0
 #define abs(x)  ( (x<0) ? -(x) : x )
 
 typedef struct		s_cam
@@ -29,7 +41,7 @@ typedef struct		s_cam
 	double		offsety;
 	double		x;
 	double		y;
-	double 		z;
+	double		z;
 	int			scale;
 	double		**matrix;
 }					t_cam;
@@ -107,19 +119,14 @@ int		die(char *reason)
 	ft_putendl(reason);
 	return (1);
 }
-// libft
-int	ft_abs(int i)
-{
-	if (i < 0)
-		return (-i);
-	return (i);
-}
+
 int		ft_lerpi(int first, int second, double p)
 {
 	if (first == second)
 		return (first);
 	return ((int)((double)first + (second - first) * p));
 }
+
 size_t	ft_lstcount(t_list *lst)
 {
 	size_t i;
@@ -151,7 +158,7 @@ void		ft_lstrev(t_list **alst)
 	*alst = prev;
 }
 
-int ft_is_space(char c)
+int		ft_is_space(char c)
 {
 	if (c == ' ' || c == '\n' || c == '\t'
 		|| c == '\v' || c == '\r' || c == '\f' || c == '\0')
@@ -178,6 +185,7 @@ size_t	ft_countwords(char *str, char sep)
 	}
 	return (result);
 }
+
 double	ft_ilerp(double val, double first, double second)
 {
 	if (val == first)
@@ -186,7 +194,7 @@ double	ft_ilerp(double val, double first, double second)
 		return (1.0);
 	return ((val - first) / (second - first));
 }
-/*********************/
+
 static int	cleanup(t_list **lst, t_map **map)
 {
 	t_list	*next;
@@ -226,7 +234,6 @@ t_map		*get_map(int width, int height)
 	return (map);
 }
 
-
 static int	get_lines(int fd, t_list **lst)
 {
 	t_list	*temp;
@@ -252,6 +259,7 @@ static int	get_lines(int fd, t_list **lst)
 	ft_lstrev(lst);
 	return (1);
 }
+
 t_vector	*get_vector(int x, int y, char *str)
 {
 	t_vector	*v;
@@ -294,9 +302,9 @@ void		find_depth(t_map *m)
 	m->depth_max = max;
 }
 
-int get_light(int start, int end, double percentage)
+int		get_light(int start, int end, double percentage)
 {
-    return ((int)((1 - percentage) * start + percentage * end));
+	return ((int)((1 - percentage) * start + percentage * end));
 }
 
 int			clerp(int c1, int c2, double p)
@@ -317,7 +325,6 @@ t_vector	vector_at(t_map *map, int x, int y)
 {
 	return (*map->vectors[y * map->width + x]);
 }
-
 
 void		fill_colors(t_map *m)
 {
@@ -368,7 +375,6 @@ static int	populate_map(t_map **m, t_list *list)
 	return (1);
 }
 
-
 int			read_file(int fd, t_map **m)
 {
 	t_list	*lst;
@@ -382,26 +388,28 @@ int			read_file(int fd, t_map **m)
 	return (populate_map(m, lst));
 }
 
-void		ft_printMap(t_map *map)
-{
-
-		int j = 0;
-		int k = 0;
-		while (j < map->height)
-		{
-			while (k < map->width)
-			{
-				if (0 <= abs(vector_at(map, k, j).z) && abs(vector_at(map, k, j).z) <= 9)
-					printf("%0.f  ", vector_at(map, k, j).z);
-				else
-					printf("%0.f ", vector_at(map, k, j).z);
-				k++;
-			}
-			printf("\n");
-			k = 0;
-			j++;
-		}
-}
+/*
+**void		ft_printMap(t_map *map)
+**{
+**	int j = 0;
+**	int k = 0;
+**	while (j < map->height)
+**	{
+**		while (k < map->width)
+**		{
+**			if (0 <= abs(vector_at(map, k, j).z)
+** && abs(vector_at(map, k, j).z) <= 9)
+**				printf("%0.f  ", vector_at(map, k, j).z);
+**			else
+**				printf("%0.f ", vector_at(map, k, j).z);
+**			k++;
+**		}
+**		printf("\n");
+**		k = 0;
+**		j++;
+**	}
+**}
+*/
 
 t_image	*del_image(t_mlx *mlx, t_image *img)
 {
@@ -432,8 +440,6 @@ void	clear_image(t_image *image)
 {
 	ft_bzero(image->ptr, WIN_WIDTH * WIN_HEIGHT * image->bpp);
 }
-
-
 
 t_image	*new_image(t_mlx *mlx)
 {
@@ -515,41 +521,42 @@ t_vector	project_vector(t_vector v, t_mlx *mlx)
 	return (v);
 }
 
-int ft_sign(double n)
+int		ft_sign(double n)
 {
-	return(n < 0 ? -1 : 1);
+	return (n < 0 ? -1 : 1);
 }
 
-double percent(int start, int end, int current)
+double		percent(int start, int end, int current)
 {
-    double placement;
-    double distance;
+	double placement;
+	double distance;
 
-    placement = current - start;
-    distance = end - start;
-    return ((distance == 0) ? 1.0 : (placement / distance));
+	placement = current - start;
+	distance = end - start;
+	return ((distance == 0) ? 1.0 : (placement / distance));
 }
 
-int ft_put_points(t_mlx *mlx, t_line *l, t_vector *p1,
-		t_vector *p2)
+int		ft_put_points(t_mlx *mlx, t_line *l, t_vector *p1, t_vector *p2)
 {
 	double percentage;
-		if (l->dx > l->dy)
-        percentage = percent(l->start.x, l->end.x, p1->x);
-    else
-        percentage = percent(l->start.y, l->end.y, p1->y);
-		image_set_pixel(mlx->image, (int)p1->x, (int)p1->y, clerp(p1->color, p2->color, percentage));
-		l->err2 = l->err;
-		if (l->err2 > -l->dx)
-		{
-			l->err -= l->dy;
-			p1->x += l->sx;
-		}
-		if (l->err2 < l->dy)
-		{
-			l->err += l->dx;
-			p1->y += l->sy;
-		}
+
+	if (l->dx > l->dy)
+		percentage = percent(l->start.x, l->end.x, p1->x);
+	else
+		percentage = percent(l->start.y, l->end.y, p1->y);
+	image_set_pixel(mlx->image, (int)p1->x,
+	(int)p1->y, clerp(p1->color, p2->color, percentage));
+	l->err2 = l->err;
+	if (l->err2 > -l->dx)
+	{
+		l->err -= l->dy;
+		p1->x += l->sx;
+	}
+	if (l->err2 < l->dy)
+	{
+		l->err += l->dx;
+		p1->y += l->sy;
+	}
 	return (0);
 }
 
@@ -563,9 +570,9 @@ void		ft_plotline(t_mlx *mlx, t_vector p1, t_vector p2)
 	p2.y = (int)p2.y;
 	line.start = p1;
 	line.end = p2;
-	line.dx = (int)ft_abs((int)p2.x - (int)p1.x);
+	line.dx = (int)abs((int)p2.x - (int)p1.x);
 	line.sx = (int)p1.x < (int)p2.x ? 1 : -1;
-	line.dy = (int)ft_abs((int)p2.y - (int)p1.y);
+	line.dy = (int)abs((int)p2.y - (int)p1.y);
 	line.sy = (int)p1.y < (int)p2.y ? 1 : -1;
 	line.err = (line.dx > line.dy ? line.dx : -line.dy) / 2;
 	while (((int)p1.x != (int)p2.x || (int)p1.y != (int)p2.y))
@@ -590,17 +597,19 @@ void		render(t_mlx *mlx)
 		{
 			v = project_vector(vector_at(map, x, y), mlx);
 			if (x + 1 < map->width)
-				ft_plotline(mlx, v, project_vector(vector_at(map, x + 1, y), mlx));
+				ft_plotline(mlx, v,
+						project_vector(vector_at(map, x + 1, y), mlx));
 			if (y + 1 < map->height)
-				ft_plotline(mlx, v, project_vector(vector_at(map, x, y + 1), mlx));
-				y++;
+				ft_plotline(mlx, v,
+					project_vector(vector_at(map, x, y + 1), mlx));
+			y++;
 		}
 		x++;
 	}
 	mlx_put_image_to_window(mlx->mlx, mlx->window, mlx->image->image, 0, 0);
 }
 
-void ft_press_move(t_mlx *mlx)
+void		ft_press_move(t_mlx *mlx)
 {
 	if (mlx->keyboard->d == true)
 		mlx->cam->offsetx += 20;
@@ -628,7 +637,7 @@ void ft_press_move(t_mlx *mlx)
 		mlx->cam->y += 0.1;
 }
 
-int ft_handle_keys_press(int key, t_mlx *mlx)
+int		ft_handle_keys_press(int key, t_mlx *mlx)
 {
 	if (key == W_KEY)
 		mlx->keyboard->w = true;
@@ -655,12 +664,11 @@ int ft_handle_keys_press(int key, t_mlx *mlx)
 	if (key == L_AR_KEY)
 		mlx->keyboard->l_ar = true;
 	ft_press_move(mlx);
-		render(mlx);
+	render(mlx);
 	return (0);
 }
 
-
-int ft_handle_keys_release(int key, t_mlx *mlx)
+int		ft_handle_keys_release(int key, t_mlx *mlx)
 {
 	if (key == W_KEY)
 		mlx->keyboard->w = false;
@@ -690,19 +698,19 @@ int ft_handle_keys_release(int key, t_mlx *mlx)
 	return (0);
 }
 
-int ft_mouse_press(int button, int x, int y, t_mlx *mlx)
+int		ft_mouse_press(int button, int x, int y, t_mlx *mlx)
 {
 	mlx->mouse->isdown = true;
 	return (0);
 }
 
-int ft_mouse_release(int button, int x, int y, t_mlx *mlx)
+int		ft_mouse_release(int button, int x, int y, t_mlx *mlx)
 {
 	mlx->mouse->isdown = false;
 	return (0);
 }
 
-int ft_mouse_move(int x, int y, t_mlx *mlx)
+int		ft_mouse_move(int x, int y, t_mlx *mlx)
 {
 	mlx->mouse->lastx = mlx->mouse->x;
 	mlx->mouse->lasty = mlx->mouse->y;
@@ -717,30 +725,27 @@ int ft_mouse_move(int x, int y, t_mlx *mlx)
 	return (0);
 }
 
-int ft_mlx_hooks(t_mlx *mlx)
+int		ft_mlx_hooks(t_mlx *mlx)
 {
 	mlx_hook(mlx->window, 2, 0, ft_handle_keys_press, (void *)mlx);
-	 mlx_hook(mlx->window, 3, 0, ft_handle_keys_release, (void *)mlx);
-
-	mlx_mouse_hook (mlx->window, ft_mouse_press, (void *)mlx);
+	mlx_hook(mlx->window, 3, 0, ft_handle_keys_release, (void *)mlx);
+	mlx_mouse_hook(mlx->window, ft_mouse_press, (void *)mlx);
 	mlx_hook(mlx->window, 5, 0, ft_mouse_release, (void *)mlx);
 	mlx_hook(mlx->window, 6, 0, ft_mouse_move, (void *)mlx);
-
 	return (0);
 }
-int main(int argc, char** argv)
+
+int		main(int argc, char **argv)
 {
 	t_map	*map;
 	t_mlx	*mlx;
 	int		fd;
+
 	fd = open(argv[1], O_RDONLY);
 	if (argc != 2)
 		ft_putstr("usage:./fdf map.fdf\n");
 	if (fd < 0 || !read_file(fd, &map))
 		return (die("error: invalid file"));
-	printf("w:%d h:%d\n", map->width, map->height);
-	printf("d_min:%d  d_max:%d\n", map->depth_min, map->depth_max);
-	ft_printMap(map);
 	if ((mlx = init(ft_strjoin("FdF - ", argv[1]), map)) == NULL)
 		return (die("error: mlx couldn't init"));
 	mlx->map = map;
