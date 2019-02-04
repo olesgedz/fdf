@@ -6,12 +6,11 @@
 /*   By: jblack-b <jblack-b@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 17:14:14 by jblack-b          #+#    #+#             */
-/*   Updated: 2019/02/04 20:34:04 by jblack-b         ###   ########.fr       */
+/*   Updated: 2019/02/04 21:00:30 by jblack-b         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minilibx_macos/mlx.h"
-#include <stdio.h>
 #include <fcntl.h>
 #include "libft/includes/libft.h"
 #include <limits.h>
@@ -79,18 +78,7 @@ typedef struct		s_image
 }					t_image;
 typedef struct s_keyboard
 {
-	int w;
-	int a;
-	int s;
-	int d;
-	int u;
-	int i;
-	int o;
-	int j;
-	int k;
-	int l;
-	int m;
-	int l_ar;
+	int *keys;
 } t_keyboard;
 typedef struct		s_mlx
 {
@@ -461,9 +449,11 @@ t_mlx		*init(char *title, t_map *map)
 			WIN_HEIGHT, title)) == NULL ||
 		(mlx->cam = ft_memalloc(sizeof(t_cam))) == NULL ||
 		(mlx->mouse = ft_memalloc(sizeof(t_mouse))) == NULL ||
-		(mlx->keyboard = ft_memalloc(sizeof(t_mouse))) == NULL ||
+		(mlx->keyboard = ft_memalloc(sizeof(t_keyboard))) == NULL ||
+		(mlx->keyboard->keys = ft_memalloc(sizeof(int) * 100)) == NULL ||
 		(mlx->image = new_image(mlx)) == NULL)
 		return (mlxdel(mlx));
+	ft_bzero((char *)mlx->keyboard->keys, 100);
 	mlx->cam->x = -M_PI / 6;
 	mlx->cam->y = -M_PI / 6;
 	mlx->cam->z = 0;
@@ -565,39 +555,35 @@ void		ft_plotline(t_mlx *mlx, t_vector p1, t_vector p2)
 			break ;
 }
 
-void		ft_draw_menu(t_mlx *mlx)
+int		ft_draw_menu(t_mlx *mlx)
 {
 	int		y;
 
 	y = 0;
-	mlx_string_put(mlx->mlx, mlx->window, WIN_WIDTH - MENU_WIDTH, 0, 0xFFFFFFF, "How to Use");
+	mlx_string_put(mlx->mlx, mlx->window,
+		WIN_WIDTH - MENU_WIDTH, 0, 0xFFFFFFF, "How to Use");
+	return (0);
 }
 
-
-static void	ft_draw_background(t_mlx *mlx)
+static void		ft_draw_background(t_mlx *mlx)
 {
 	t_image *image;
-	int	i;
+	int i;
+	int j;
+	int k;
 
 	clear_image(mlx->image);
 	image = mlx->image;
-	int j  = 0;
-	int k = 0;
-	while ( j < WIN_HEIGHT)
+	j = 0;
+	while (j < WIN_HEIGHT)
 	{
-		k = 0;
-		while ( k < WIN_WIDTH)
-		{
-			if (k  < WIN_WIDTH - MENU_WIDTH)
-				*(int *)(image->ptr + ((k + j * WIN_WIDTH) * image->bpp)) = 0x1E1E1E;
-			else
-				*(int *)(image->ptr + ((k + j * WIN_WIDTH) * image->bpp)) = 0x222222;
-			k++;
-		}
+		k = -1;
+		while (k++ < WIN_WIDTH)
+			*(int *)(image->ptr + ((k + j * WIN_WIDTH) * image->bpp)) =
+			k < WIN_WIDTH - MENU_WIDTH ? 0x1E1E1E : 0x222222;
 		j++;
 	}
 }
-
 
 void		render(t_mlx *mlx)
 {
@@ -609,7 +595,6 @@ void		render(t_mlx *mlx)
 	map = mlx->map;
 	x = 0;
 	ft_draw_background(mlx);
-	ft_draw_menu(mlx);
 	while (x < map->width)
 	{
 		y = 0;
@@ -620,8 +605,8 @@ void		render(t_mlx *mlx)
 				ft_plotline(mlx, v,
 					project_vector(vector_at(map, x + 1, y), mlx));
 			if (y + 1 < map->height)
-			ft_plotline(mlx, v,
-				project_vector(vector_at(map, x, y + 1), mlx));
+				ft_plotline(mlx, v,
+					project_vector(vector_at(map, x, y + 1), mlx));
 			y++;
 		}
 		x++;
@@ -632,58 +617,35 @@ void		render(t_mlx *mlx)
 
 void		ft_press_move(t_mlx *mlx)
 {
-	if (mlx->keyboard->d == TRUE)
+	if (mlx->keyboard->keys[D_KEY] == TRUE)
 		mlx->cam->offsetx += 20;
-	if (mlx->keyboard->a == TRUE)
+	if (mlx->keyboard->keys[A_KEY] == TRUE)
 		mlx->cam->offsetx -= 20;
-	if (mlx->keyboard->s == TRUE)
+	if (mlx->keyboard->keys[S_KEY] == TRUE)
 		mlx->cam->offsety += 20;
-	if (mlx->keyboard->w == TRUE)
+	if (mlx->keyboard->keys[W_KEY] == TRUE)
 		mlx->cam->offsety -= 20;
-	if (mlx->keyboard->u == TRUE)
+	if (mlx->keyboard->keys[U_KEY] == TRUE)
 		mlx->cam->scale -= 0.5;
-	if (mlx->keyboard->o == TRUE)
+	if (mlx->keyboard->keys[O_KEY] == TRUE)
 		mlx->cam->scale += 1.5;
-	if (mlx->keyboard->m == TRUE)
+	if (mlx->keyboard->keys[M_KEY] == TRUE)
 		mlx->cam->z -= 0.1;
-	if (mlx->keyboard->l_ar == TRUE)
+	if (mlx->keyboard->keys[L_AR_KEY] == TRUE)
 		mlx->cam->z += 0.1;
-	if (mlx->keyboard->i == TRUE)
+	if (mlx->keyboard->keys[I_KEY] == TRUE)
 		mlx->cam->x += 0.1;
-	if (mlx->keyboard->j == TRUE)
+	if (mlx->keyboard->keys[J_KEY] == TRUE)
 		mlx->cam->y -= 0.1;
-	if (mlx->keyboard->k == TRUE)
+	if (mlx->keyboard->keys[K_KEY] == TRUE)
 		mlx->cam->x -= 0.1;
-	if (mlx->keyboard->l == TRUE)
+	if (mlx->keyboard->keys[L_KEY] == TRUE)
 		mlx->cam->y += 0.1;
 }
 
 int		ft_handle_keys_press(int key, t_mlx *mlx)
 {
-	if (key == W_KEY)
-		mlx->keyboard->w = TRUE;
-	if (key == A_KEY)
-		mlx->keyboard->a = TRUE;
-	if (key == S_KEY)
-		mlx->keyboard->s = TRUE;
-	if (key == D_KEY)
-		mlx->keyboard->d = TRUE;
-	if (key == U_KEY)
-		mlx->keyboard->u = TRUE;
-	if (key == I_KEY)
-		mlx->keyboard->i = TRUE;
-	if (key == O_KEY)
-		mlx->keyboard->o = TRUE;
-	if (key == J_KEY)
-		mlx->keyboard->j = TRUE;
-	if (key == K_KEY)
-		mlx->keyboard->k = TRUE;
-	if (key == L_KEY)
-		mlx->keyboard->l = TRUE;
-	if (key == M_KEY)
-		mlx->keyboard->m = TRUE;
-	if (key == L_AR_KEY)
-		mlx->keyboard->l_ar = TRUE;
+	mlx->keyboard->keys[key] = TRUE;
 	ft_press_move(mlx);
 	render(mlx);
 	return (0);
@@ -691,30 +653,7 @@ int		ft_handle_keys_press(int key, t_mlx *mlx)
 
 int		ft_handle_keys_release(int key, t_mlx *mlx)
 {
-	if (key == W_KEY)
-		mlx->keyboard->w = FALSE;
-	if (key == A_KEY)
-		mlx->keyboard->a = FALSE;
-	if (key == S_KEY)
-		mlx->keyboard->s = FALSE;
-	if (key == D_KEY)
-		mlx->keyboard->d = FALSE;
-	if (key == U_KEY)
-		mlx->keyboard->u = FALSE;
-	if (key == I_KEY)
-		mlx->keyboard->i = FALSE;
-	if (key == O_KEY)
-		mlx->keyboard->o = FALSE;
-	if (key == J_KEY)
-		mlx->keyboard->j = FALSE;
-	if (key == K_KEY)
-		mlx->keyboard->k = FALSE;
-	if (key == L_KEY)
-		mlx->keyboard->l = FALSE;
-	if (key == M_KEY)
-		mlx->keyboard->m = FALSE;
-	if (key == L_AR_KEY)
-		mlx->keyboard->l_ar = FALSE;
+	mlx->keyboard->keys[key] = FALSE;
 	render(mlx);
 	return (0);
 }
