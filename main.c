@@ -6,7 +6,7 @@
 /*   By: jblack-b <jblack-b@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 17:14:14 by jblack-b          #+#    #+#             */
-/*   Updated: 2019/02/04 19:34:53 by jblack-b         ###   ########.fr       */
+/*   Updated: 2019/02/04 20:34:04 by jblack-b         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -618,16 +618,16 @@ void		render(t_mlx *mlx)
 			v = project_vector(vector_at(map, x, y), mlx);
 			if (x + 1 < map->width)
 				ft_plotline(mlx, v,
-						project_vector(vector_at(map, x + 1, y), mlx));
+					project_vector(vector_at(map, x + 1, y), mlx));
 			if (y + 1 < map->height)
-				ft_plotline(mlx, v,
-					project_vector(vector_at(map, x, y + 1), mlx));
+			ft_plotline(mlx, v,
+				project_vector(vector_at(map, x, y + 1), mlx));
 			y++;
 		}
 		x++;
 	}
 	mlx_put_image_to_window(mlx->mlx, mlx->window, mlx->image->image, 0, 0);
-		ft_draw_menu(mlx);
+	ft_draw_menu(mlx);
 }
 
 void		ft_press_move(t_mlx *mlx)
