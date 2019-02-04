@@ -6,7 +6,7 @@
 /*   By: jblack-b <jblack-b@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 17:14:14 by jblack-b          #+#    #+#             */
-/*   Updated: 2019/02/04 21:00:30 by jblack-b         ###   ########.fr       */
+/*   Updated: 2019/02/04 21:57:10 by jblack-b         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "libft/includes/libft.h"
 #include <limits.h>
 #include <math.h>
+#include <stdio.h>
 
 #define WIN_WIDTH			1680
 #define WIN_HEIGHT			720
@@ -31,9 +32,22 @@
 #define L_KEY 37
 #define M_KEY 46
 #define L_AR_KEY 43
+#define B_KEY 11
 #define TRUE		1
 #define FALSE		0
 #define ABS(x)  ( (x < 0) ? -(x) : x )
+
+
+
+# define TEXT_COLOR			0xEAEAEA
+# define BACKGROUND			0x222222
+# define MENU_BACKGROUND	0x1E1E1E
+
+# define COLOR_DISCO		0x9A1F6A
+# define COLOR_BRICK_RED	0xC2294E
+# define COLOR_FLAMINGO		0xEC4B27
+# define COLOR_JAFFA		0xEF8633
+# define COLOR_SAFFRON		0xF3AF3D
 
 typedef struct		s_cam
 {
@@ -59,6 +73,8 @@ typedef struct		s_map
 	int			depth_min;
 	int			depth_max;
 	t_vector	**vectors;
+	double *colors;
+	int ncolor;
 }					t_map;
 typedef struct		s_mouse
 {
@@ -321,13 +337,34 @@ void		fill_colors(t_map *m)
 		while (v.x < m->width)
 		{
 			cur = m->vectors[(int)v.y * m->width + (int)v.x];
-			cur->color = ft_get_color(0xFF0000, 0xFFFFFF, (cur->z -
+			cur->color = ft_get_color(COLOR_BRICK_RED, 0xFFFFFF, (cur->z -
 				m->depth_min) / (m->depth_max - m->depth_min));
 			v.x++;
 		}
 		v.y++;
 	}
 }
+
+void		ft_change_color(t_map *m)
+{
+	t_vector	v;
+	t_vector	*cur;
+
+	v.y = 0;
+	while (v.y < m->height)
+	{
+		v.x = 0;
+		while (v.x < m->width)
+		{
+			cur = m->vectors[(int)v.y * m->width + (int)v.x];
+			cur->color = ft_get_color(m->colors[m->ncolor], 0xFFFFFF, (cur->z -
+				m->depth_min) / (m->depth_max - m->depth_min));
+			v.x++;
+		}
+		v.y++;
+	}
+}
+
 
 static int	populate_map(t_map **m, t_list *list)
 {
@@ -438,6 +475,20 @@ t_image	*new_image(t_mlx *mlx)
 	return (img);
 }
 
+void ft_init_colors(t_map *map)
+{
+	map->colors = ft_memalloc(sizeof(double) * 10);
+
+	ft_bzero((char *)map->colors, 10);
+	map->colors[0] = 0xFF;
+	map->colors[1] = COLOR_DISCO;
+	map->colors[2] = COLOR_BRICK_RED;
+	map->colors[3] = COLOR_FLAMINGO;
+	map->colors[4] = COLOR_JAFFA;
+	map->colors[5] = COLOR_SAFFRON;
+	map->ncolor = 0;
+}
+
 t_mlx		*init(char *title, t_map *map)
 {
 	t_mlx	*mlx;
@@ -453,6 +504,7 @@ t_mlx		*init(char *title, t_map *map)
 		(mlx->keyboard->keys = ft_memalloc(sizeof(int) * 100)) == NULL ||
 		(mlx->image = new_image(mlx)) == NULL)
 		return (mlxdel(mlx));
+	ft_init_colors(map);
 	ft_bzero((char *)mlx->keyboard->keys, 100);
 	mlx->cam->x = -M_PI / 6;
 	mlx->cam->y = -M_PI / 6;
@@ -645,8 +697,16 @@ void		ft_press_move(t_mlx *mlx)
 
 int		ft_handle_keys_press(int key, t_mlx *mlx)
 {
+	printf("key:%d\n", key);
 	mlx->keyboard->keys[key] = TRUE;
 	ft_press_move(mlx);
+	if (key == B_KEY)
+	{
+		mlx->map->ncolor += 1;
+		if (mlx->map->ncolor > 5 )
+			mlx->map->ncolor = 0;
+		ft_change_color(mlx->map);
+	}
 	render(mlx);
 	return (0);
 }
