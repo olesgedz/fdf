@@ -74,7 +74,7 @@ t_mlx				*ft_init(char *title, t_map *map)
 		(mlx->cam = ft_memalloc(sizeof(t_cam))) == NULL ||
 		(mlx->mouse = ft_memalloc(sizeof(t_mouse))) == NULL ||
 		(mlx->keyboard = ft_memalloc(sizeof(t_keyboard))) == NULL ||
-		(mlx->keyboard->keys = ft_memalloc(sizeof(int) * 100)) == NULL ||
+		(mlx->keyboard->keys = ft_memalloc(sizeof(int) * 200)) == NULL ||
 		(mlx->image = ft_new_image(mlx)) == NULL)
 		return (ft_mlxdel(mlx));
 	ft_init_colors(map);
