@@ -6,7 +6,7 @@
 /*   By: jblack-b <jblack-b@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 16:29:39 by jblack-b          #+#    #+#             */
-/*   Updated: 2019/02/05 18:49:05 by jblack-b         ###   ########.fr       */
+/*   Updated: 2019/02/05 22:46:10 by jblack-b         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,5 +130,5 @@ void				ft_fill_colors(t_map *m);
 t_map				*get_map(int width, int height);
 t_image				*ft_del_image(t_mlx *mlx, t_image *img);
 t_mlx				*ft_mlxdel(t_mlx *mlx);
-void			ft_image_set_pixel(t_image *image, int x, int y, int color);
+void				ft_image_set_pixel(t_image *image, int x, int y, int color);
 #endif
