@@ -121,7 +121,7 @@ static int				ft_get_lines(int fd, t_list **lst)
 	int		ret;
 
 	expected = -1;
-	while ((ret = get_next_line(fd, &line)))
+	while ((ret = get_next_line(fd, &line)) > 0)
 	{
 		if (expected == -1)
 			expected = (int)ft_countwords(line, ' ');
