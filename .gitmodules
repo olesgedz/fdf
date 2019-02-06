@@ -7,3 +7,6 @@
 [submodule "42-FdF"]
 	path = 42-FdF
 	url = https://github.com/pbondoer/42-FdF.git
+[submodule "fdf42/libft"]
+	path = fdf42/libft
+	url = https://github.com/olesgedz/libft.git

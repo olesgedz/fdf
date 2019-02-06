@@ -6,14 +6,14 @@
 /*   By: jblack-b <jblack-b@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 17:20:01 by jblack-b          #+#    #+#             */
-/*   Updated: 2019/02/05 18:59:59 by jblack-b         ###   ########.fr       */
+/*   Updated: 2019/02/06 03:22:17 by olesgedz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "fdf.h"
 #include <limits.h>
-
+#include <stdio.h>
 static int				ft_cleanup(t_list **lst, t_map **map)
 {
 	t_list	*next;
@@ -121,6 +121,10 @@ static int				ft_get_lines(int fd, t_list **lst)
 	int		ret;
 
 	expected = -1;
+<<<<<<< HEAD
+=======
+	printf("%d", get_next_line(fd, &line));
+>>>>>>> d2e16ff9ff2ba1eb875ded0000bef0eccb3051ef
 	while ((ret = get_next_line(fd, &line)) > 0)
 	{
 		if (expected == -1)
