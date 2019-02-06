@@ -113,21 +113,6 @@ static int				ft_populate_map(t_map **m, t_list *list)
 	return (1);
 }
 
-static int ft_check_line(char *s)
-{
-	size_t i;
-	
-	i = 0;
-	while (s[i] != '\0')
-	{
-		if ((!ft_isdigit(s[i])) && s[i] != '+' && s[i] != '-'
-		&& !ft_is_space(s[i]))
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
 static int				ft_get_lines(int fd, t_list **lst)
 {
 	t_list	*temp;

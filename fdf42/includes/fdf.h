@@ -131,4 +131,5 @@ t_map				*get_map(int width, int height);
 t_image				*ft_del_image(t_mlx *mlx, t_image *img);
 t_mlx				*ft_mlxdel(t_mlx *mlx);
 void				ft_image_set_pixel(t_image *image, int x, int y, int color);
+int 				ft_check_line(char *s)
 #endif

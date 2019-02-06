@@ -51,3 +51,18 @@ t_mlx		*ft_mlxdel(t_mlx *mlx)
 	ft_memdel((void **)&mlx);
 	return (NULL);
 }
+
+int			ft_check_line(char *s)
+{
+	size_t i;
+	
+	i = 0;
+	while (s[i] != '\0')
+	{
+		if ((!ft_isdigit(s[i])) && s[i] != '+' && s[i] != '-'
+		&& !ft_is_space(s[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
