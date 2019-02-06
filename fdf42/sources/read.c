@@ -13,7 +13,6 @@
 #include "libft.h"
 #include "fdf.h"
 #include <limits.h>
-#include <stdio.h>
 static int				ft_cleanup(t_list **lst, t_map **map)
 {
 	t_list	*next;
@@ -121,10 +120,6 @@ static int				ft_get_lines(int fd, t_list **lst)
 	int		ret;
 
 	expected = -1;
-<<<<<<< HEAD
-=======
-	printf("%d", get_next_line(fd, &line));
->>>>>>> d2e16ff9ff2ba1eb875ded0000bef0eccb3051ef
 	while ((ret = get_next_line(fd, &line)) > 0)
 	{
 		if (expected == -1)
