@@ -6,7 +6,7 @@
 /*   By: jblack-b <jblack-b@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 17:38:42 by jblack-b          #+#    #+#             */
-/*   Updated: 2019/02/05 18:50:35 by jblack-b         ###   ########.fr       */
+/*   Updated: 2019/02/06 16:13:29 by jblack-b         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ t_mlx		*ft_mlxdel(t_mlx *mlx)
 int			ft_check_line(char *s)
 {
 	size_t i;
-	
+
 	i = 0;
 	while (s[i] != '\0')
 	{
