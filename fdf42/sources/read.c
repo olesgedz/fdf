@@ -6,13 +6,14 @@
 /*   By: jblack-b <jblack-b@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 17:20:01 by jblack-b          #+#    #+#             */
-/*   Updated: 2019/02/06 03:22:17 by olesgedz         ###   ########.fr       */
+/*   Updated: 2019/02/06 15:24:35 by jblack-b         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "fdf.h"
 #include <limits.h>
+
 static int				ft_cleanup(t_list **lst, t_map **map)
 {
 	t_list	*next;
@@ -112,6 +113,21 @@ static int				ft_populate_map(t_map **m, t_list *list)
 	return (1);
 }
 
+static int ft_check_line(char *s)
+{
+	size_t i;
+	
+	i = 0;
+	while (s[i] != '\0')
+	{
+		if ((!ft_isdigit(s[i])) && s[i] != '+' && s[i] != '-'
+		&& !ft_is_space(s[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 static int				ft_get_lines(int fd, t_list **lst)
 {
 	t_list	*temp;
@@ -125,7 +141,7 @@ static int				ft_get_lines(int fd, t_list **lst)
 		if (expected == -1)
 			expected = (int)ft_countwords(line, ' ');
 		temp = ft_lstnew(line, ft_strlen(line) + 1);
-		if ((temp) == NULL)
+		if ((temp) == NULL || !ft_check_line(line))
 			return (ft_cleanup(lst, NULL));
 		ft_lstadd(lst, temp);
 		if (expected != (int)ft_countwords(line, ' '))
