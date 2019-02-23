@@ -23,7 +23,7 @@ int		main(int argc, char **argv)
 
 	fd = open(argv[1], O_RDONLY);
 	if (argc != 2)
-		ft_putstr("usage:./fdf map.fdf\n");
+		return (ft_error("usage:./fdf map.fdf"));
 	if (fd < 0 || !ft_read_file(fd, &map))
 		return (ft_error("error: invalid file"));
 	if ((mlx = ft_init(ft_strjoin("FdF - ", argv[1]), map)) == NULL)
