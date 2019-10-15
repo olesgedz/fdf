@@ -5,8 +5,8 @@
 
 typedef struct    data_s
 {
-	void          *mlx_ptr;
-	void          *win_ptr;
+	void        *mlx_ptr;
+	void        *win_ptr;
 	void  		*img_ptr;
 	char 		*img_data;
 	int width;
@@ -33,11 +33,11 @@ void ft_render(data_t *data)
 	data->img_ptr =  mlx_new_image(data->mlx_ptr, data->width , data->height);
 	data->img_data = mlx_get_data_addr(data->img_ptr, &data->bpp, &data->size_line, &data->endian);
 
-	for (int j = 0; j < 250; j++)
+	for (int j = 0; j < data->height; j++)
 	{
-		for (int k = 0; k < 250; k++)
+		for (int k = 0; k < data->width; k++)
 		{
-			ft_putpixel(data, k, j, k << 16 | j << 8);
+			ft_putpixel(data, k, j, (k / (data->width / 256 + 1)) << 16  | (j / (data->height / 256 + 1)) << 8) ;
 		}
 	}
 
@@ -55,8 +55,8 @@ int ft_press(int key, void *data_void)
 int main(void)
 {
 	    
-	data.width = 500;
-	data.height = 500;
+	data.width = 1500;
+	data.height = 1500;
 	if ((data.mlx_ptr = mlx_init()) == NULL)
 				return (EXIT_FAILURE);
 	if ((data.win_ptr = mlx_new_window(data.mlx_ptr, data.width, data.height, "Hello world")) == NULL)
